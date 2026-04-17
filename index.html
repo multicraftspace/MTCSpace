@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MCspace</title>
+
+<style>
+@font-face {
+  font-family: 'MultiCraft';
+  src: url('MultiCraft.ttf');
+}
+
+body {
+  margin: 0;
+  font-family: 'MultiCraft', sans-serif;
+  background: #ffffff;
+  color: #2d0b4e;
+}
+
+/* Top bar */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+  border-bottom: 2px solid #a855f7;
+}
+
+.logo {
+  font-size: 28px;
+}
+
+/* Grid */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+  padding: 30px;
+}
+
+.card {
+  border: 2px solid #a855f7;
+  border-radius: 18px;
+  overflow: hidden;
+  background: linear-gradient(145deg, #ffffff, #f3e8ff);
+  box-shadow: 0 10px 25px rgba(168,85,247,0.25);
+  transition: transform 0.25s, box-shadow 0.25s;
+  position: relative;
+}
+
+.card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  border: 1px solid rgba(168,85,247,0.4);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(168,85,247,0.35);
+}
+
+.card:hover::after {
+  opacity: 1;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.card img.bg {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+}
+
+.card-content {
+  padding: 15px;
+}
+
+.server-name {
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+.play-btn {
+  display: inline-block;
+  padding: 10px 15px;
+  border: 2px solid #a855f7;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.play-btn:active {
+  transform: scale(0.9);
+  background: #a855f7;
+  color: white;
+}
+
+.heart {
+  width: 24px;
+  cursor: pointer;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <div class="logo">MCspace</div>
+</div>
+
+<div class="grid">
+  <!-- TEST CARD (ID = 1) -->
+  <div class="card">
+    <img class="bg" src="bg1.png">
+    <div class="card-content">
+      <div class="server-name">Test Server</div>
+      
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div class="play-btn" onclick="joinServer('abc123')">Play</div>
+        <img class="heart" src="heart1.png">
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+function joinServer(code) {
+  window.location.href = "mcspace.github.io/" + code;
+}
+</script>
+
+</body>
+</html>
+
+
+<!-- SERVER PAGE (create separate file: server.html) -->
+
+<!-- ========================== -->
+<!-- server.html -->
+<!-- ========================== -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Server</title>
+
+<style>
+@font-face {
+  font-family: 'MultiCraft';
+  src: url('MultiCraft.ttf');
+}
+
+body {
+  font-family: 'MultiCraft';
+  margin: 0;
+  background: white;
+  color: #2d0b4e;
+  padding: 30px;
+}
+
+.container {
+  max-width: 600px;
+  margin: auto;
+  border: 2px solid #a855f7;
+  border-radius: 15px;
+  padding: 20px;
+}
+
+.invite-box {
+  display: flex;
+  margin-top: 20px;
+}
+
+.invite-box input {
+  flex: 1;
+  padding: 10px;
+  border: 2px solid #a855f7;
+  border-radius: 10px 0 0 10px;
+}
+
+.invite-box button {
+  padding: 10px;
+  border: 2px solid #a855f7;
+  border-left: none;
+  background: #a855f7;
+  color: white;
+  border-radius: 0 10px 10px 0;
+  cursor: pointer;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h2>Test Server</h2>
+  <p>Best MultiCraft server ever</p>
+
+  <div class="invite-box">
+    <input id="invite" value="abc123" readonly>
+    <button onclick="copyCode()">Copy</button>
+  </div>
+</div>
+
+<script>
+function copyCode() {
+  const input = document.getElementById('invite');
+  input.select();
+  document.execCommand('copy');
+  alert('Copied!');
+}
+</script>
+
+</body>
+</html>
