@@ -22,7 +22,6 @@ body {
 .header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
   padding: 15px 25px;
   border-bottom: 2px solid #a855f7;
 }
@@ -35,32 +34,6 @@ body {
 
 .logo img {
   height: 40px;
-}
-
-.top-btn {
-  padding: 10px 15px;
-  border: 2px solid #a855f7;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: 0.25s;
-}
-
-.top-btn:hover {
-  background: #a855f7;
-  color: white;
-  transform: scale(1.05);
-}
-
-/* POPUP */
-.popup {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background: white;
-  border: 2px solid #a855f7;
-  border-radius: 12px;
-  padding: 15px;
-  display: none;
 }
 
 /* GRID */
@@ -77,10 +50,12 @@ body {
   background: white;
   box-shadow: 0 15px 35px rgba(168,85,247,0.25);
   transition: 0.3s;
+  border: 2px solid transparent;
 }
 
-.card:hover {
-  transform: translateY(-10px) scale(1.03);
+.card.trending {
+  border: 2px solid red;
+  box-shadow: 0 0 20px rgba(255,0,0,0.4);
 }
 
 .bg {
@@ -95,39 +70,26 @@ body {
 
 .title-row {
   display: flex;
-  align-items: center;
   gap: 8px;
-  font-size: 18px;
+  align-items: center;
 }
 
-.title-row img {
-  width: 18px;
-}
-
-/* DESCRIPTION */
 .desc {
   font-size: 13px;
-  margin-top: 6px;
   opacity: 0.7;
+  margin-top: 5px;
 }
 
-/* ACTIONS */
 .actions {
   margin-top: 10px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-}
-
-.visits {
-  font-size: 13px;
-  opacity: 0.7;
 }
 
 .play-btn {
   padding: 8px 14px;
   border-radius: 10px;
-  background: linear-gradient(135deg, #a855f7, #7e22ce);
+  background: #a855f7;
   color: white;
   cursor: pointer;
   transition: 0.25s;
@@ -135,11 +97,11 @@ body {
 
 .play-btn:hover {
   transform: scale(1.1);
-  box-shadow: 0 0 15px rgba(168,85,247,0.6);
 }
 
-.play-btn:active {
-  transform: scale(0.9);
+.visits {
+  font-size: 12px;
+  opacity: 0.7;
 }
 </style>
 </head>
@@ -151,56 +113,90 @@ body {
     <img src="logo.png">
     <div>MCspace</div>
   </div>
-  <div class="top-btn" onclick="openPopup()">Add my server</div>
-</div>
-
-<div class="popup" id="popup">
-  DM @rwo1ld in discord, to add your server.
-  <br><br>
-  <button onclick="closePopup()">Close</button>
 </div>
 
 <div class="grid" id="grid"></div>
 
-<script>
-const servers = [
-  { id: 1, name: "Erratic SMP", desc: "Great MultiCraft SMP with no areas, no starter kits and more fun features.", code: "M5R9X1NY", visits: 123 }
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyD4An6C8ZEdiJsohwo76QuRxv1hhjNmRlI",
+  authDomain: "mcspaceomega.firebaseapp.com",
+  projectId: "mcspaceomega",
+  storageBucket: "mcspaceomega.firebasestorage.app",
+  messagingSenderId: "984192110931",
+  appId: "1:984192110931:web:d7392a9815ab248c6391a6"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+let servers = [
+  { id: 1, name: "Erratic SMP", desc: "Good MultiCraft SMP with no areas, and more very cool features.", code: "M5R9X1NY" }
 ];
 
-const grid = document.getElementById("grid");
+async function loadVisits(server) {
+  const ref = doc(db, "servers", server.code);
+  const snap = await getDoc(ref);
 
-servers.forEach(server => {
-  const card = document.createElement("div");
-  card.className = "card";
+  if (snap.exists()) {
+    server.visits = snap.data().visits || 0;
+  } else {
+    server.visits = 0;
+  }
+}
 
-  card.innerHTML = `
-    <img class="bg" src="bg${server.id}.png">
-    <div class="content">
-      <div class="title-row">
-        <img src="heart${server.id}.png">
-        <div>${server.name}</div>
+async function init() {
+  await Promise.all(servers.map(loadVisits));
+
+  // Sort by visits
+  servers.sort((a,b) => b.visits - a.visits);
+
+  const grid = document.getElementById("grid");
+
+  servers.forEach(server => {
+    const card = document.createElement("div");
+
+    const trending = server.visits >= 5;
+
+    card.className = "card" + (trending ? " trending" : "");
+
+    card.innerHTML = `
+      <img class="bg" src="bg${server.id}.png">
+      <div class="content">
+        <div class="title-row">
+          <img src="heart${server.id}.png" width="18">
+          <div>${server.name}</div>
+        </div>
+        <div class="desc">${server.desc}</div>
+        <div class="actions">
+          <div class="visits">${server.visits} plays</div>
+          <div class="play-btn" onclick="joinServer('${server.code}')">Play</div>
+        </div>
       </div>
-      <div class="desc">${server.desc}</div>
-      <div class="actions">
-        <div class="play-btn" onclick="joinServer('${server.code}')">Play</div>
-      </div>
-    </div>
-  `;
+    `;
 
-  grid.appendChild(card);
-});
+    grid.appendChild(card);
+  });
+}
 
-function joinServer(code) {
+window.joinServer = async function(code) {
+  const ref = doc(db, "servers", code);
+
+  try {
+    await updateDoc(ref, {
+      visits: increment(1)
+    });
+  } catch {
+    await setDoc(ref, { visits: 1 });
+  }
+
   window.location.href = "server.html?code=" + code;
-}
+};
 
-function openPopup() {
-  document.getElementById("popup").style.display = "block";
-}
-
-function closePopup() {
-  document.getElementById("popup").style.display = "none";
-}
+init();
 </script>
 
 </body>
