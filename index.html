@@ -164,7 +164,7 @@ body {
 
 <script>
 const servers = [
-  { id: 1, name: "Test Server", desc: "Best MultiCraft server ever", code: "abc123", visits: 123 }
+  { id: 1, name: "Test Server", desc: "Best MultiCraft server ever", code: "abc123", type: Premium }
 ];
 
 const grid = document.getElementById("grid");
@@ -182,7 +182,7 @@ servers.forEach(server => {
       </div>
       <div class="desc">${server.desc}</div>
       <div class="actions">
-        <div class="visits">${server.visits} visits</div>
+        <div class="visits">${server.type} server</div>
         <div class="play-btn" onclick="joinServer('${server.code}')">Play</div>
       </div>
     </div>
