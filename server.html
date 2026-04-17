@@ -17,90 +17,49 @@ body {
   background: radial-gradient(circle at top, #ffffff, #f3e8ff);
 }
 
-/* BACK BUTTON */
 .back {
   margin: 20px;
   cursor: pointer;
-  border: 2px solid #a855f7;
-  padding: 8px 12px;
-  border-radius: 10px;
-  width: fit-content;
-  transition: 0.25s;
 }
 
-.back:hover {
-  background: #a855f7;
-  color: white;
-}
-
-/* FULL WIDTH CARD */
 .card {
   width: 100%;
   max-width: 1000px;
   margin: auto;
   background: white;
   border-radius: 20px;
-  box-shadow: 0 20px 50px rgba(168,85,247,0.3);
   overflow: hidden;
 }
 
 .bg {
   width: 100%;
   aspect-ratio: 16/9;
-  object-fit: cover;
 }
 
 .content {
   padding: 25px;
 }
 
-.title-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 26px;
-}
-
-.title-row img {
-  width: 26px;
-}
-
-.desc {
-  margin-top: 10px;
-  font-size: 16px;
-}
-
-/* INVITE */
 .invite-label {
   margin-top: 20px;
-  font-size: 14px;
   opacity: 0.7;
 }
 
 .invite {
   display: flex;
-  margin-top: 5px;
 }
 
 .invite input {
   flex: 1;
-  padding: 14px;
-  border-radius: 10px 0 0 10px;
+  padding: 12px;
   border: 2px solid #a855f7;
 }
 
 .invite button {
-  padding: 14px;
-  border: none;
   background: #a855f7;
   color: white;
-  border-radius: 0 10px 10px 0;
+  padding: 12px;
   cursor: pointer;
-  transition: 0.25s;
-}
-
-.invite button:hover {
-  background: #7e22ce;
 }
 </style>
 </head>
@@ -112,12 +71,8 @@ body {
 <div class="card">
   <img id="bg" class="bg">
   <div class="content">
-    <div class="title-row">
-      <img id="heart">
-      <div id="name">Loading...</div>
-    </div>
-
-    <div class="desc" id="desc">Loading server info...</div>
+    <h2 id="name">Loading...</h2>
+    <p id="desc"></p>
 
     <div class="invite-label">Invite Code</div>
     <div class="invite">
@@ -127,9 +82,24 @@ body {
   </div>
 </div>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyD4An6C8ZEdiJsohwo76QuRxv1hhjNmRlI",
+  authDomain: "mcspaceomega.firebaseapp.com",
+  projectId: "mcspaceomega",
+  storageBucket: "mcspaceomega.firebasestorage.app",
+  messagingSenderId: "984192110931",
+  appId: "1:984192110931:web:d7392a9815ab248c6391a6"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
 const servers = {
-  "M5R9X1NY": { id: 1, name: "Erratic SMP", desc: "Great MultiCraft SMP with no areas, no starter kits and more fun features." }
+  "M5R9X1NY": { id: 1, name: "Erratic SMP", desc: "Good MultiCraft SMP with no areas, and more very cool features." }
 };
 
 const params = new URLSearchParams(window.location.search);
@@ -137,22 +107,24 @@ const code = params.get("code");
 
 if (servers[code]) {
   const s = servers[code];
+
   document.getElementById("name").innerText = s.name;
   document.getElementById("desc").innerText = s.desc;
   document.getElementById("invite").value = code;
   document.getElementById("bg").src = "bg" + s.id + ".png";
-  document.getElementById("heart").src = "heart" + s.id + ".png";
-} else {
-  document.getElementById("name").innerText = "Server not found";
 }
 
-function copyCode() {
-  navigator.clipboard.writeText(document.getElementById("invite").value);
-}
+window.copyCode = function() {
+  const text = document.getElementById("invite").value;
 
-function goBack() {
+  navigator.clipboard.writeText(text).then(() => {
+    alert("Copied!");
+  });
+};
+
+window.goBack = function() {
   window.location.href = "index.html";
-}
+};
 </script>
 
 </body>
