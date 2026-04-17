@@ -84,24 +84,33 @@ body {
   margin-top: 10px;
   display: flex;
   justify-content: space-between;
-}
-
-.play-btn {
-  padding: 8px 14px;
-  border-radius: 10px;
-  background: #a855f7;
-  color: white;
-  cursor: pointer;
-  transition: 0.25s;
-}
-
-.play-btn:hover {
-  transform: scale(1.1);
+  align-items: center;
 }
 
 .visits {
   font-size: 12px;
   opacity: 0.7;
+}
+
+/* BUTTONS */
+.play-btn {
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 2px solid #a855f7;
+  background: linear-gradient(135deg, #a855f7, #7e22ce);
+  color: white;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 5px 15px rgba(168,85,247,0.3);
+}
+
+.play-btn:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 10px 25px rgba(168,85,247,0.5);
+}
+
+.play-btn:active {
+  transform: scale(0.92);
 }
 </style>
 </head>
@@ -140,27 +149,20 @@ let servers = [
 async function loadVisits(server) {
   const ref = doc(db, "servers", server.code);
   const snap = await getDoc(ref);
-
-  if (snap.exists()) {
-    server.visits = snap.data().visits || 0;
-  } else {
-    server.visits = 0;
-  }
+  server.visits = snap.exists() ? (snap.data().visits || 0) : 0;
 }
 
 async function init() {
   await Promise.all(servers.map(loadVisits));
 
-  // Sort by visits
   servers.sort((a,b) => b.visits - a.visits);
 
   const grid = document.getElementById("grid");
 
   servers.forEach(server => {
-    const card = document.createElement("div");
-
     const trending = server.visits >= 5;
 
+    const card = document.createElement("div");
     card.className = "card" + (trending ? " trending" : "");
 
     card.innerHTML = `
@@ -172,7 +174,7 @@ async function init() {
         </div>
         <div class="desc">${server.desc}</div>
         <div class="actions">
-          <div class="visits">${server.visits} plays</div>
+          <div class="visits">${server.visits} visits</div>
           <div class="play-btn" onclick="joinServer('${server.code}')">Play</div>
         </div>
       </div>
@@ -183,14 +185,20 @@ async function init() {
 }
 
 window.joinServer = async function(code) {
-  const ref = doc(db, "servers", code);
+  const key = "lastVisit_" + code;
+  const last = localStorage.getItem(key);
+  const now = Date.now();
 
-  try {
-    await updateDoc(ref, {
-      visits: increment(1)
-    });
-  } catch {
-    await setDoc(ref, { visits: 1 });
+  if (!last || now - last > 600000) {
+    const ref = doc(db, "servers", code);
+
+    try {
+      await updateDoc(ref, { visits: increment(1) });
+    } catch {
+      await setDoc(ref, { visits: 1 });
+    }
+
+    localStorage.setItem(key, now);
   }
 
   window.location.href = "server.html?code=" + code;
