@@ -17,11 +17,26 @@ body {
   background: radial-gradient(circle at top, #ffffff, #f3e8ff);
 }
 
-.back {
-  margin: 20px;
+/* BUTTON */
+.back, .invite button {
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 2px solid #a855f7;
+  background: linear-gradient(135deg, #a855f7, #7e22ce);
+  color: white;
   cursor: pointer;
+  transition: all 0.25s ease;
 }
 
+.back:hover, .invite button:hover {
+  transform: scale(1.05);
+}
+
+.back {
+  margin: 20px;
+}
+
+/* CARD */
 .card {
   width: 100%;
   max-width: 1000px;
@@ -40,6 +55,12 @@ body {
   padding: 25px;
 }
 
+.title-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
 .invite-label {
   margin-top: 20px;
   opacity: 0.7;
@@ -47,19 +68,14 @@ body {
 
 .invite {
   display: flex;
+  gap: 5px;
 }
 
 .invite input {
   flex: 1;
   padding: 12px;
+  border-radius: 10px;
   border: 2px solid #a855f7;
-}
-
-.invite button {
-  background: #a855f7;
-  color: white;
-  padding: 12px;
-  cursor: pointer;
 }
 </style>
 </head>
@@ -71,7 +87,11 @@ body {
 <div class="card">
   <img id="bg" class="bg">
   <div class="content">
-    <h2 id="name">Loading...</h2>
+    <div class="title-row">
+      <img id="heart" width="24">
+      <h2 id="name">Loading...</h2>
+    </div>
+
     <p id="desc"></p>
 
     <div class="invite-label">Invite Code</div>
@@ -84,7 +104,7 @@ body {
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyD4An6C8ZEdiJsohwo76QuRxv1hhjNmRlI",
@@ -95,31 +115,40 @@ const firebaseConfig = {
   appId: "1:984192110931:web:d7392a9815ab248c6391a6"
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+initializeApp(firebaseConfig);
+getFirestore();
 
 const servers = {
   "M5R9X1NY": { id: 1, name: "Erratic SMP", desc: "Good MultiCraft SMP with no areas, and more very cool features." }
 };
 
-const params = new URLSearchParams(window.location.search);
-const code = params.get("code");
+const code = new URLSearchParams(window.location.search).get("code");
 
 if (servers[code]) {
   const s = servers[code];
-
   document.getElementById("name").innerText = s.name;
   document.getElementById("desc").innerText = s.desc;
   document.getElementById("invite").value = code;
   document.getElementById("bg").src = "bg" + s.id + ".png";
+  document.getElementById("heart").src = "heart" + s.id + ".png";
 }
 
 window.copyCode = function() {
-  const text = document.getElementById("invite").value;
+  navigator.clipboard.writeText(document.getElementById("invite").value);
 
-  navigator.clipboard.writeText(text).then(() => {
-    alert("Copied!");
-  });
+  const msg = document.createElement("div");
+  msg.innerText = "Copied!";
+  msg.style.position = "fixed";
+  msg.style.bottom = "20px";
+  msg.style.left = "50%";
+  msg.style.transform = "translateX(-50%)";
+  msg.style.background = "#a855f7";
+  msg.style.color = "white";
+  msg.style.padding = "10px 20px";
+  msg.style.borderRadius = "12px";
+
+  document.body.appendChild(msg);
+  setTimeout(() => msg.remove(), 2000);
 };
 
 window.goBack = function() {
