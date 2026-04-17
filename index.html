@@ -18,6 +18,7 @@ body {
   color: #2d0b4e;
 }
 
+/* HEADER */
 .header {
   display: flex;
   justify-content: space-between;
@@ -27,7 +28,13 @@ body {
 }
 
 .logo {
-  font-size: 28px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo img {
+  height: 40px;
 }
 
 .top-btn {
@@ -35,8 +42,16 @@ body {
   border: 2px solid #a855f7;
   border-radius: 10px;
   cursor: pointer;
+  transition: 0.25s;
 }
 
+.top-btn:hover {
+  background: #a855f7;
+  color: white;
+  transform: scale(1.05);
+}
+
+/* POPUP */
 .popup {
   position: fixed;
   top: 20px;
@@ -45,10 +60,10 @@ body {
   border: 2px solid #a855f7;
   border-radius: 12px;
   padding: 15px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
   display: none;
 }
 
+/* GRID */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -82,16 +97,31 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
+  font-size: 18px;
 }
 
 .title-row img {
-  width: 20px;
+  width: 18px;
 }
 
+/* DESCRIPTION */
+.desc {
+  font-size: 13px;
+  margin-top: 6px;
+  opacity: 0.7;
+}
+
+/* ACTIONS */
 .actions {
   margin-top: 10px;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.visits {
+  font-size: 13px;
+  opacity: 0.7;
 }
 
 .play-btn {
@@ -100,11 +130,12 @@ body {
   background: linear-gradient(135deg, #a855f7, #7e22ce);
   color: white;
   cursor: pointer;
-  transition: 0.2s;
+  transition: 0.25s;
 }
 
 .play-btn:hover {
   transform: scale(1.1);
+  box-shadow: 0 0 15px rgba(168,85,247,0.6);
 }
 
 .play-btn:active {
@@ -116,12 +147,16 @@ body {
 <body>
 
 <div class="header">
-  <div class="logo">MCspace</div>
+  <div class="logo">
+    <img src="logo.png">
+    <div>MCspace</div>
+  </div>
   <div class="top-btn" onclick="openPopup()">Add my server</div>
 </div>
 
 <div class="popup" id="popup">
-  <div>DM @rwo1ld in discord, to add your server.</div>
+  DM @rwo1ld in discord, to add your server.
+  <br><br>
   <button onclick="closePopup()">Close</button>
 </div>
 
@@ -129,7 +164,7 @@ body {
 
 <script>
 const servers = [
-  { id: 1, name: "Test Server", code: "abc123" }
+  { id: 1, name: "Test Server", desc: "Best MultiCraft server ever", code: "abc123", visits: 123 }
 ];
 
 const grid = document.getElementById("grid");
@@ -145,7 +180,9 @@ servers.forEach(server => {
         <img src="heart${server.id}.png">
         <div>${server.name}</div>
       </div>
+      <div class="desc">${server.desc}</div>
       <div class="actions">
+        <div class="visits">${server.visits} visits</div>
         <div class="play-btn" onclick="joinServer('${server.code}')">Play</div>
       </div>
     </div>
