@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MCspace Server</title>
+<title>Server</title>
 
 <style>
 @font-face {
@@ -13,23 +13,21 @@
 
 body {
   margin: 0;
-  font-family: 'MultiCraft', sans-serif;
-  background: #ffffff;
-  color: #2d0b4e;
+  font-family: 'MultiCraft';
+  background: radial-gradient(circle at top, #ffffff, #f3e8ff);
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
 }
 
-.container {
+.card {
   width: 90%;
-  max-width: 600px;
-  border: 2px solid #a855f7;
-  border-radius: 18px;
+  max-width: 500px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 50px rgba(168,85,247,0.3);
   overflow: hidden;
-  background: linear-gradient(145deg, #ffffff, #f3e8ff);
-  box-shadow: 0 15px 40px rgba(168,85,247,0.3);
 }
 
 .bg {
@@ -46,54 +44,38 @@ h2 {
   margin: 0 0 10px;
 }
 
-p {
-  margin: 0 0 15px;
-}
-
-.invite-box {
+.invite {
   display: flex;
-  gap: 0;
+  margin-top: 15px;
 }
 
-.invite-box input {
+.invite input {
   flex: 1;
   padding: 12px;
-  border: 2px solid #a855f7;
   border-radius: 10px 0 0 10px;
-  font-family: 'MultiCraft';
+  border: 2px solid #a855f7;
 }
 
-.invite-box button {
-  padding: 12px 15px;
-  border: 2px solid #a855f7;
-  border-left: none;
+.invite button {
+  padding: 12px;
+  border: none;
   background: #a855f7;
   color: white;
-  cursor: pointer;
   border-radius: 0 10px 10px 0;
-  transition: 0.2s;
-}
-
-.invite-box button:hover {
-  background: #9333ea;
-}
-
-.invite-box button:active {
-  transform: scale(0.9);
+  cursor: pointer;
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
-  <img id="bg" class="bg" src="">
-  
+<div class="card">
+  <img id="bg" class="bg">
   <div class="content">
     <h2 id="name">Loading...</h2>
-    <p id="desc">Please wait</p>
+    <p id="desc">Loading server info...</p>
 
-    <div class="invite-box">
+    <div class="invite">
       <input id="invite" readonly>
       <button onclick="copyCode()">Copy</button>
     </div>
@@ -101,42 +83,27 @@ p {
 </div>
 
 <script>
-// Fake database (you can expand this later)
 const servers = {
-  "abc123": {
-    id: 1,
-    name: "Test Server",
-    desc: "Best MultiCraft server ever"
-  }
+  "abc123": { id: 1, name: "Test Server", desc: "Best MultiCraft server ever" }
 };
 
-// Get code from URL
 const params = new URLSearchParams(window.location.search);
 const code = params.get("code");
 
-// Load server
 if (servers[code]) {
-  const server = servers[code];
-
-  document.getElementById("name").innerText = server.name;
-  document.getElementById("desc").innerText = server.desc;
+  const s = servers[code];
+  document.getElementById("name").innerText = s.name;
+  document.getElementById("desc").innerText = s.desc;
   document.getElementById("invite").value = code;
-
-  // Load images using your system
-  document.getElementById("bg").src = "bg" + server.id + ".png";
-
+  document.getElementById("bg").src = "bg" + s.id + ".png";
 } else {
   document.getElementById("name").innerText = "Server not found";
-  document.getElementById("desc").innerText = "Invalid invite code";
+  document.getElementById("desc").innerText = "Invalid code";
 }
 
-// Copy function (modern)
 function copyCode() {
   const text = document.getElementById("invite").value;
-
-  navigator.clipboard.writeText(text).then(() => {
-    alert("Copied!");
-  });
+  navigator.clipboard.writeText(text);
 }
 </script>
 
