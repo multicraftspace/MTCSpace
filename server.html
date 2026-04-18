@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Server</title>
+<title>Loading...</title>
 
 <style>
 @font-face {
@@ -182,14 +182,17 @@ if (s) {
   bg.src = "bg" + s.id + ".png";
   heart.src = "heart" + s.id + ".png";
 
-  /* fallback if image missing */
   bg.onerror = () => bg.src = "bg1.png";
   heart.onerror = () => heart.src = "heart1.png";
 
-  document.title = s.name + " | MCspace";
+  /* ✅ DYNAMIC TITLE */
+  document.title = s.name + " • MCspace";
+
 } else {
   document.getElementById("name").innerText = "Server not found";
   document.getElementById("desc").innerText = "Invalid or missing server code.";
+
+  document.title = "Server not found • MCspace";
 }
 
 /* COPY */
