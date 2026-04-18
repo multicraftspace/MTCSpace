@@ -1,3 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Loading...</title>
+
+<style>
+@font-face {
+  font-family: 'MultiCraft';
+  src: url('MultiCraft.ttf');
+}
+
+body {
+  margin: 0;
+  font-family: 'MultiCraft';
+  background: radial-gradient(circle at top, #ffffff, #f3e8ff);
+}
+
+/* BUTTONS */
+.back, .invite button {
+  padding: 10px 16px;
+  border: 2px solid #a855f7;
+  background: linear-gradient(135deg, #a855f7, #7e22ce);
+  color: white;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.back {
+  border-radius: 12px;
+  margin: 20px;
+}
+
+.back:hover, .invite button:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 8px 20px rgba(168,85,247,0.4);
+}
+
+.back:active, .invite button:active {
+  transform: scale(0.92);
+}
+
+/* CARD */
+.card {
+  width: 100%;
+  max-width: 1000px;
+  margin: auto;
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 15px 40px rgba(168,85,247,0.25);
+}
+
+.bg {
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+}
+
+.content {
+  padding: 25px;
+}
+
+/* TITLE */
+.title-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.title-row img {
+  width: 26px;
+}
+
+/* DESCRIPTION */
+#desc {
+  margin-top: 10px;
+  opacity: 0.8;
+}
+
+/* INVITE */
+.invite-label {
+  margin-top: 25px;
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+.invite {
+  display: flex;
+  margin-top: 5px;
+}
+
+.invite input {
+  flex: 1;
+  padding: 12px;
+  border: 2px solid #a855f7;
+  border-right: none;
+  border-radius: 12px 0 0 12px;
+  outline: none;
+  font-family: 'MultiCraft';
+}
+
+.invite input:focus {
+  box-shadow: 0 0 10px rgba(168,85,247,0.3);
+}
+
+.invite button {
+  border-left: none;
+  border-radius: 0 12px 12px 0;
+}
+</style>
+</head>
+
+<body>
+
+<div class="back" onclick="goBack()">← Back</div>
+
+<div class="card">
+  <img id="bg" class="bg">
+
+  <div class="content">
+    <div class="title-row">
+      <img id="heart">
+      <h2 id="name">Loading...</h2>
+    </div>
+
+    <p id="desc"></p>
+
+    <div class="invite-label">Invite Code</div>
+
+    <div class="invite">
+      <input id="invite" readonly onclick="this.select()">
+      <button onclick="copyCode()">Copy</button>
+    </div>
+  </div>
+</div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -36,8 +174,6 @@ const servers = {
     name: "New Types PvP",
     desc: "Awesome PvP server, with a lot fun features and gamemodes."
   },
-
-  /* 🔥 NEW SERVERS */
   "94D92LVD": {
     id: 5,
     name: "SMP12",
@@ -54,3 +190,58 @@ const servers = {
     desc: "In here, YOU will try to beat the impossible 36 cubicles of the server to escape!"
   }
 };
+
+/* GET CODE */
+const code = new URLSearchParams(window.location.search).get("code");
+const s = servers[code];
+
+/* LOAD SERVER */
+if (s) {
+  document.getElementById("name").innerText = s.name;
+  document.getElementById("desc").innerText = s.desc;
+  document.getElementById("invite").value = code;
+
+  const bg = document.getElementById("bg");
+  const heart = document.getElementById("heart");
+
+  bg.src = "bg" + s.id + ".png";
+  heart.src = "heart" + s.id + ".png";
+
+  bg.onerror = () => bg.src = "bg1.png";
+  heart.onerror = () => heart.src = "heart1.png";
+
+  document.title = s.name + " • MCspace";
+} else {
+  document.getElementById("name").innerText = "Server not found";
+  document.getElementById("desc").innerText = "Invalid or missing server code.";
+  document.title = "Server not found • MCspace";
+}
+
+/* COPY */
+window.copyCode = function() {
+  navigator.clipboard.writeText(document.getElementById("invite").value);
+
+  const msg = document.createElement("div");
+  msg.innerText = "Copied!";
+  msg.style.position = "fixed";
+  msg.style.bottom = "20px";
+  msg.style.left = "50%";
+  msg.style.transform = "translateX(-50%)";
+  msg.style.background = "#a855f7";
+  msg.style.color = "white";
+  msg.style.padding = "10px 20px";
+  msg.style.borderRadius = "12px";
+  msg.style.boxShadow = "0 10px 25px rgba(0,0,0,0.2)";
+
+  document.body.appendChild(msg);
+  setTimeout(() => msg.remove(), 2000);
+};
+
+/* BACK */
+window.goBack = function() {
+  window.location.href = "index.html";
+};
+</script>
+
+</body>
+</html>
