@@ -17,10 +17,9 @@ body {
   background: radial-gradient(circle at top, #ffffff, #f3e8ff);
 }
 
-/* BUTTON */
+/* BUTTONS */
 .back, .invite button {
   padding: 10px 16px;
-  border-radius: 12px;
   border: 2px solid #a855f7;
   background: linear-gradient(135deg, #a855f7, #7e22ce);
   color: white;
@@ -28,12 +27,18 @@ body {
   transition: all 0.25s ease;
 }
 
-.back:hover, .invite button:hover {
-  transform: scale(1.05);
+.back {
+  border-radius: 12px;
+  margin: 20px;
 }
 
-.back {
-  margin: 20px;
+.back:hover, .invite button:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 8px 20px rgba(168,85,247,0.4);
+}
+
+.back:active, .invite button:active {
+  transform: scale(0.92);
 }
 
 /* CARD */
@@ -44,38 +49,68 @@ body {
   background: white;
   border-radius: 20px;
   overflow: hidden;
+  box-shadow: 0 15px 40px rgba(168,85,247,0.25);
 }
 
 .bg {
   width: 100%;
   aspect-ratio: 16/9;
+  object-fit: cover;
 }
 
 .content {
   padding: 25px;
 }
 
+/* TITLE */
 .title-row {
   display: flex;
   gap: 10px;
   align-items: center;
 }
 
+.title-row img {
+  width: 26px;
+}
+
+/* DESCRIPTION */
+#desc {
+  margin-top: 10px;
+  opacity: 0.8;
+}
+
+/* INVITE */
 .invite-label {
-  margin-top: 20px;
+  margin-top: 25px;
+  font-size: 14px;
   opacity: 0.7;
 }
 
 .invite {
   display: flex;
-  gap: 5px;
+  margin-top: 5px;
 }
 
+/* INPUT (LEFT) */
 .invite input {
   flex: 1;
   padding: 12px;
-  border-radius: 10px;
   border: 2px solid #a855f7;
+  border-right: none;
+  border-radius: 12px 0 0 12px;
+  outline: none;
+  font-family: 'MultiCraft';
+}
+
+/* INPUT FOCUS */
+.invite input:focus {
+  box-shadow: 0 0 10px rgba(168,85,247,0.3);
+}
+
+/* BUTTON (RIGHT) */
+.invite button {
+  border-left: none;
+  border-radius: 0 12px 12px 0;
 }
 </style>
 </head>
@@ -86,17 +121,19 @@ body {
 
 <div class="card">
   <img id="bg" class="bg">
+
   <div class="content">
     <div class="title-row">
-      <img id="heart" width="24">
+      <img id="heart">
       <h2 id="name">Loading...</h2>
     </div>
 
     <p id="desc"></p>
 
     <div class="invite-label">Invite Code</div>
+
     <div class="invite">
-      <input id="invite" readonly>
+      <input id="invite" readonly onclick="this.select()">
       <button onclick="copyCode()">Copy</button>
     </div>
   </div>
@@ -118,21 +155,30 @@ const firebaseConfig = {
 initializeApp(firebaseConfig);
 getFirestore();
 
+/* SERVERS */
 const servers = {
-  "M5R9X1NY": { id: 1, name: "Erratic SMP", desc: "Good MultiCraft SMP with no areas, and more very cool features." }
+  "M5R9X1NY": {
+    id: 1,
+    name: "Erratic SMP",
+    desc: "Good MultiCraft SMP with no areas, and more very cool features."
+  }
 };
 
 const code = new URLSearchParams(window.location.search).get("code");
 
 if (servers[code]) {
   const s = servers[code];
+
   document.getElementById("name").innerText = s.name;
   document.getElementById("desc").innerText = s.desc;
   document.getElementById("invite").value = code;
   document.getElementById("bg").src = "bg" + s.id + ".png";
   document.getElementById("heart").src = "heart" + s.id + ".png";
+} else {
+  document.getElementById("name").innerText = "Server not found";
 }
 
+/* COPY */
 window.copyCode = function() {
   navigator.clipboard.writeText(document.getElementById("invite").value);
 
@@ -146,11 +192,13 @@ window.copyCode = function() {
   msg.style.color = "white";
   msg.style.padding = "10px 20px";
   msg.style.borderRadius = "12px";
+  msg.style.boxShadow = "0 10px 25px rgba(0,0,0,0.2)";
 
   document.body.appendChild(msg);
   setTimeout(() => msg.remove(), 2000);
 };
 
+/* BACK */
 window.goBack = function() {
   window.location.href = "index.html";
 };
