@@ -144,8 +144,8 @@ const db = getFirestore(app);
 
 let servers = [
   { id: 1, name: "Erratic SMP", desc: "Good MultiCraft SMP with no areas, and more very cool features.", code: "M5R9X1NY" }
+  { id: 2, name: "Ronaldo Vs Messi", desc: "BEST SERVER  👌, PARKOUR / PvP  / MINI GAMES / BEDWARS  / MANHUNT / TREASURE HUNT / BRIDGING /  AXE PVP / AND MANY MORE .. ✨", code: "KAAYBNDP" }
 ];
-
 async function loadVisits(server) {
   const ref = doc(db, "servers", server.code);
   const snap = await getDoc(ref);
