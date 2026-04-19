@@ -37,10 +37,6 @@ body {
   box-shadow: 0 8px 20px rgba(168,85,247,0.4);
 }
 
-.back:active, .invite button:active {
-  transform: scale(0.92);
-}
-
 /* CARD */
 .card {
   width: 100%;
@@ -50,6 +46,36 @@ body {
   border-radius: 20px;
   overflow: hidden;
   box-shadow: 0 15px 40px rgba(168,85,247,0.25);
+  position: relative;
+}
+
+.card.trending {
+  border: 2px solid red;
+}
+
+.card.recommended {
+  border: 2px solid cyan;
+}
+
+/* BADGES */
+.badge {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  color: white;
+}
+
+.badge.trending {
+  background: red;
+}
+
+.badge.recommended {
+  background: cyan;
+  color: black;
+  top: 50px;
 }
 
 .bg {
@@ -62,15 +88,25 @@ body {
   padding: 25px;
 }
 
-/* TITLE */
 .title-row {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .title-row img {
   width: 26px;
+}
+
+.author {
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+.check {
+  color: cyan;
+  font-size: 14px;
 }
 
 /* DESCRIPTION */
@@ -101,10 +137,6 @@ body {
   font-family: 'MultiCraft';
 }
 
-.invite input:focus {
-  box-shadow: 0 0 10px rgba(168,85,247,0.3);
-}
-
 .invite button {
   border-left: none;
   border-radius: 0 12px 12px 0;
@@ -116,13 +148,15 @@ body {
 
 <div class="back" onclick="goBack()">← Back</div>
 
-<div class="card">
+<div id="card" class="card">
   <img id="bg" class="bg">
 
   <div class="content">
     <div class="title-row">
       <img id="heart">
       <h2 id="name">Loading...</h2>
+      <span id="author" class="author"></span>
+      <span id="check" class="check"></span>
     </div>
 
     <p id="desc"></p>
@@ -138,71 +172,48 @@ body {
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyD4An6C8ZEdiJsohwo76QuRxv1hhjNmRlI",
-  authDomain: "mcspaceomega.firebaseapp.com",
-  projectId: "mcspaceomega",
-  storageBucket: "mcspaceomega.firebasestorage.app",
-  messagingSenderId: "984192110931",
-  appId: "1:984192110931:web:d7392a9815ab248c6391a6"
+  apiKey: "AIzaSyD4...",
 };
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-initializeApp(firebaseConfig);
-getFirestore();
+/* VERIFIED USERS */
+const verifiedUsers = ["RedWorld"];
+
+/* RECOMMENDED SERVERS */
+const recommendedServers = ["M5R9X1NY"];
 
 /* SERVERS */
 const servers = {
-  "M5R9X1NY": {
-    id: 1,
-    name: "Erratic SMP",
-    desc: "Good MultiCraft SMP with no areas, and more very cool features."
-  },
-  "KAAYBNDP": {
-    id: 2,
-    name: "Ronaldo Vs Messi",
-    desc: "BEST SERVER 👌, PARKOUR / PvP / MINI GAMES / BEDWARS / MANHUNT / TREASURE HUNT / BRIDGING / AXE PVP / AND MANY MORE .. ✨"
-  },
-  "MCSRVR03": {
-    id: 3,
-    name: "FlatWorld",
-    desc: "Creative Server"
-  },
-  "JLIVC3V9": {
-    id: 4,
-    name: "New Types PvP",
-    desc: "Awesome PvP server, with a lot fun features and gamemodes."
-  },
-  "94D92LVD": {
-    id: 5,
-    name: "SMP12",
-    desc: "In here, it's your job to have fun! The world open, PVP; it's a place where you can do anything!"
-  },
-  "XX9IXQ6H": {
-    id: 6,
-    name: "Stone Simulator",
-    desc: "In here, we live underground! Also, we buy items from The Shop! With currencies such as Stone, Cobblestone, and more!"
-  },
-  "QVZACNG5": {
-    id: 7,
-    name: "Parkour Cubicles",
-    desc: "In here, YOU will try to beat the impossible 36 cubicles of the server to escape!"
-  }
+  "M5R9X1NY": {id:1,name:"Erratic SMP",desc:"Good MultiCraft SMP with no areas, and more very cool features.",author:"RedWorld"},
+  "KAAYBNDP": {id:2,name:"Ronaldo Vs Messi",desc:"BEST SERVER 👌, PARKOUR / PvP / MINI GAMES / BEDWARS / MANHUNT / TREASURE HUNT / BRIDGING / AXE PVP / AND MANY MORE .. ✨",author:"Elder"},
+  "MCSRVR03": {id:3,name:"FlatWorld",desc:"Creative Server",author:"Unknown"},
+  "JLIVC3V9": {id:4,name:"New Types PvP",desc:"Awesome PvP server, with a lot fun features and gamemodes.",author:"Unknown"},
+  "94D92LVD": {id:5,name:"SMP12",desc:"In here, it's your job to have fun! The world open, PVP; it's a place where you can do anything!",author:"Jared12"},
+  "XX9IXQ6H": {id:6,name:"Stone Simulator",desc:"In here, we live underground! Also, we buy items from The Shop! With currencies such as Stone, Cobblestone, and more!",author:"Jared12"},
+  "QVZACNG5": {id:7,name:"Parkour Cubicles",desc:"In here, YOU will try to beat the impossible 36 cubicles of the server to escape!",author:"Jared12"}
 };
 
-/* GET CODE */
 const code = new URLSearchParams(window.location.search).get("code");
 const s = servers[code];
 
-/* LOAD SERVER */
 if (s) {
   document.getElementById("name").innerText = s.name;
   document.getElementById("desc").innerText = s.desc;
   document.getElementById("invite").value = code;
 
+  document.getElementById("author").innerText = "by " + s.author;
+
+  if (verifiedUsers.includes(s.author)) {
+    document.getElementById("check").innerText = "✔";
+  }
+
   const bg = document.getElementById("bg");
   const heart = document.getElementById("heart");
+  const card = document.getElementById("card");
 
   bg.src = "bg" + s.id + ".png";
   heart.src = "heart" + s.id + ".png";
@@ -210,31 +221,35 @@ if (s) {
   bg.onerror = () => bg.src = "bg1.png";
   heart.onerror = () => heart.src = "heart1.png";
 
+  /* TRENDING */
+  const ref = doc(db,"servers",code);
+  getDoc(ref).then(snap=>{
+    const visits = snap.exists()?snap.data().visits||0:0;
+
+    if (visits >= 5) {
+      card.classList.add("trending");
+      const b=document.createElement("div");
+      b.className="badge trending";
+      b.innerText="TRENDING";
+      card.appendChild(b);
+    }
+  });
+
+  /* RECOMMENDED */
+  if (recommendedServers.includes(code)) {
+    card.classList.add("recommended");
+    const b=document.createElement("div");
+    b.className="badge recommended";
+    b.innerText="RECOMMENDED";
+    card.appendChild(b);
+  }
+
   document.title = s.name + " • MCspace";
-} else {
-  document.getElementById("name").innerText = "Server not found";
-  document.getElementById("desc").innerText = "Invalid or missing server code.";
-  document.title = "Server not found • MCspace";
 }
 
 /* COPY */
 window.copyCode = function() {
   navigator.clipboard.writeText(document.getElementById("invite").value);
-
-  const msg = document.createElement("div");
-  msg.innerText = "Copied!";
-  msg.style.position = "fixed";
-  msg.style.bottom = "20px";
-  msg.style.left = "50%";
-  msg.style.transform = "translateX(-50%)";
-  msg.style.background = "#a855f7";
-  msg.style.color = "white";
-  msg.style.padding = "10px 20px";
-  msg.style.borderRadius = "12px";
-  msg.style.boxShadow = "0 10px 25px rgba(0,0,0,0.2)";
-
-  document.body.appendChild(msg);
-  setTimeout(() => msg.remove(), 2000);
 };
 
 /* BACK */
