@@ -18,6 +18,7 @@ body {
   color: #2d0b4e;
 }
 
+/* HEADER */
 .header {
   display: flex;
   justify-content: space-between;
@@ -32,10 +33,25 @@ body {
   gap: 10px;
 }
 
-.logo img {
-  height: 40px;
-}
+.logo img { height: 40px; }
 
+/* ADD BUTTON */
+.add-btn {
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 2px solid #a855f7;
+  background: linear-gradient(135deg, #a855f7, #7e22ce);
+  color: white;
+  cursor: pointer;
+  transition: 0.25s;
+}
+.add-btn:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 8px 20px rgba(168,85,247,0.4);
+}
+.add-btn:active { transform: scale(0.9); }
+
+/* GRID */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -43,6 +59,7 @@ body {
   padding: 30px;
 }
 
+/* CARD */
 .card {
   border-radius: 20px;
   overflow: hidden;
@@ -57,6 +74,7 @@ body {
 .card.trending { border: 2px solid red; }
 .card.recommended { border: 2px solid cyan; }
 
+/* BADGES */
 .badge {
   position: absolute;
   top: 10px;
@@ -66,19 +84,20 @@ body {
   font-size: 11px;
   color: white;
 }
-
 .badge.trending { background: red; }
 .badge.recommended {
   background: linear-gradient(90deg, #00e5ff, #00ffa6);
   color: black;
 }
 
+/* IMAGE */
 .bg {
   width: 100%;
   aspect-ratio: 16/9;
   object-fit: cover;
 }
 
+/* CONTENT */
 .content {
   padding: 12px;
   display: flex;
@@ -98,10 +117,11 @@ body {
   word-break: break-word;
 }
 
+/* AUTHOR */
 .author {
   font-size: 12px;
   opacity: 0.7;
-  margin-top: 2px;
+  margin-top: 4px;
   display: flex;
   align-items: center;
   gap: 5px;
@@ -112,6 +132,7 @@ body {
   height: 14px;
 }
 
+/* DESC */
 .desc {
   font-size: 13px;
   opacity: 0.7;
@@ -122,6 +143,7 @@ body {
   overflow: hidden;
 }
 
+/* ACTIONS */
 .actions {
   margin-top: auto;
   display: flex;
@@ -134,6 +156,7 @@ body {
   opacity: 0.7;
 }
 
+/* PLAY BUTTON */
 .play-btn {
   padding: 10px 16px;
   border-radius: 12px;
@@ -141,8 +164,15 @@ body {
   background: linear-gradient(135deg, #a855f7, #7e22ce);
   color: white;
   cursor: pointer;
+  transition: 0.25s;
 }
+.play-btn:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 8px 20px rgba(168,85,247,0.4);
+}
+.play-btn:active { transform: scale(0.9); }
 
+/* MODAL */
 .modal {
   position: fixed;
   top: 0;
@@ -172,14 +202,25 @@ body {
     <img src="assets/logo.png">
     <div>MCSpace</div>
   </div>
+
+  <button class="add-btn" onclick="openModal()">+ Add my server</button>
 </div>
 
 <div class="grid" id="grid"></div>
+
+<div id="modal" class="modal">
+  <div class="modal-box">
+    <h3>Add your server</h3>
+    <p>DM @rwo1ld in discord to add your server.</p>
+    <button class="add-btn" onclick="closeModal()">Close</button>
+  </div>
+</div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, doc, getDoc, setDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+/* ✅ FULL CONFIG (NOT CUT) */
 const firebaseConfig = {
   apiKey: "AIzaSyD4An6C8ZEdiJsohwo76QuRxv1hhjNmRlI",
   authDomain: "mcspaceomega.firebaseapp.com",
@@ -193,73 +234,17 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 const verifiedUsers = ["RedWorld"];
-
 const recommendedServers = ["M5R9X1NY"];
 
+/* SERVERS WITH CUSTOM PATHS */
 let servers = [
-  {
-    id:1,
-    name:"Erratic SMP",
-    desc:"Good MultiCraft SMP with no areas, and more very cool features.",
-    code:"M5R9X1NY",
-    author:"RedWorld",
-    bg:"bgs/bg1.png",
-    heart:"hearts/hpvp.png"
-  },
-  {
-    id:2,
-    name:"Ronaldo Vs Messi",
-    desc:"BEST SERVER 👌, PARKOUR / PvP / MINI GAMES / BEDWARS / MANHUNT / TREASURE HUNT / BRIDGING / AXE PVP / AND MANY MORE .. ✨",
-    code:"KAAYBNDP",
-    author:"Elder",
-    bg:"bgs/bg2.png",
-    heart:"hearts/hpvp.png"
-  },
-  {
-    id:3,
-    name:"FlatWorld",
-    desc:"Creative server where you can build anything you want in a flat world environment.",
-    code:"MCSRVR03",
-    author:"Unknown",
-    bg:"bgs/bg3.png",
-    heart:"hearts/hc.png"
-  },
-  {
-    id:4,
-    name:"New Types PvP",
-    desc:"Awesome PvP server with a lot of fun features and different gamemodes to try.",
-    code:"JLIVC3V9",
-    author:"Unknown",
-    bg:"bgs/bg4.png",
-    heart:"hearts/hpvp.png"
-  },
-  {
-    id:5,
-    name:"SMP12",
-    desc:"In here, it's your job to have fun! The world is open, PvP is enabled, and it's a place where you can do anything!",
-    code:"94D92LVD",
-    author:"Jared12",
-    bg:"bgs/bg5.png",
-    heart:"hearts/hpvp.png"
-  },
-  {
-    id:6,
-    name:"Stone Simulator",
-    desc:"In here, we live underground! You can mine, trade, and buy items from the shop using currencies like Stone, Cobblestone, and more.",
-    code:"XX9IXQ6H",
-    author:"Jared12",
-    bg:"bgs/bg6.png",
-    heart:"hearts/hpvp.png"
-  },
-  {
-    id:7,
-    name:"Parkour Cubicles",
-    desc:"Try to beat all 36 challenging cubicles in this parkour server and escape if you can!",
-    code:"QVZACNG5",
-    author:"Jared12",
-    bg:"bgs/bg7.png",
-    heart:"hearts/hpvp.png"
-  }
+  {id:1,name:"Erratic SMP",desc:"Good MultiCraft SMP with no areas, and more very cool features.",code:"M5R9X1NY",author:"RedWorld",bg:"bgs/bg1.png",heart:"hearts/hpvp.png"},
+  {id:2,name:"Ronaldo Vs Messi",desc:"BEST SERVER 👌, PARKOUR / PvP / MINI GAMES / BEDWARS / MANHUNT / TREASURE HUNT / BRIDGING / AXE PVP / AND MANY MORE .. ✨",code:"KAAYBNDP",author:"Elder",bg:"bgs/bg2.png",heart:"hearts/hpvp.png"},
+  {id:3,name:"FlatWorld",desc:"Creative server where you can build anything you want.",code:"MCSRVR03",author:"Unknown",bg:"bgs/bg3.png",heart:"hearts/hc.png"},
+  {id:4,name:"New Types PvP",desc:"Awesome PvP server with many gamemodes.",code:"JLIVC3V9",author:"Unknown",bg:"bgs/bg4.png",heart:"hearts/hpvp.png"},
+  {id:5,name:"SMP12",desc:"Open world SMP where you can do anything!",code:"94D92LVD",author:"Jared12",bg:"bgs/bg5.png",heart:"hearts/hpvp.png"},
+  {id:6,name:"Stone Simulator",desc:"Mine, trade and live underground economy.",code:"XX9IXQ6H",author:"Jared12",bg:"bgs/bg6.png",heart:"hearts/hpvp.png"},
+  {id:7,name:"Parkour Cubicles",desc:"Beat all 36 cubicles if you can!",code:"QVZACNG5",author:"Jared12",bg:"bgs/bg7.png",heart:"hearts/hpvp.png"}
 ];
 
 async function loadVisits(server){
@@ -292,7 +277,7 @@ async function init(){
 
       <div class="content">
         <div class="title-row">
-          <img src="${server.heart}" width="18" onerror="this.src='hearts/heart1.webp'">
+          <img src="${server.heart}" width="18" onerror="this.src='hearts/hpvp.png'">
           <div class="name">${server.name}</div>
         </div>
 
@@ -305,7 +290,7 @@ async function init(){
 
         <div class="actions">
           <div class="visits">${server.visits} visits</div>
-          <div class="play-btn" onclick="location.href='server.html?code=${server.code}'">Play</div>
+          <div class="play-btn" onclick="joinServer('${server.code}')">Play</div>
         </div>
       </div>
     `;
@@ -313,6 +298,16 @@ async function init(){
     grid.appendChild(card);
   });
 }
+
+window.joinServer = async function(code){
+  const ref = doc(db,"servers",code);
+  try{await updateDoc(ref,{visits:increment(1)});}
+  catch{await setDoc(ref,{visits:1});}
+  location.href="server.html?code="+code;
+};
+
+window.openModal=()=>modal.style.display="flex";
+window.closeModal=()=>modal.style.display="none";
 
 init();
 </script>
