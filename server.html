@@ -24,17 +24,12 @@ body {
   background: linear-gradient(135deg, #a855f7, #7e22ce);
   color: white;
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: 0.25s;
 }
 
 .back {
   border-radius: 12px;
   margin: 20px;
-}
-
-.back:hover, .invite button:hover {
-  transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 8px 20px rgba(168,85,247,0.4);
 }
 
 /* CARD */
@@ -68,15 +63,8 @@ body {
   color: white;
 }
 
-.badge.trending {
-  background: red;
-}
-
-.badge.recommended {
-  background: cyan;
-  color: black;
-  top: 50px;
-}
+.badge.trending { background: red; }
+.badge.recommended { background: cyan; color: black; top: 50px; }
 
 .bg {
   width: 100%;
@@ -95,9 +83,7 @@ body {
   flex-wrap: wrap;
 }
 
-.title-row img {
-  width: 26px;
-}
+.title-row img { width: 26px; }
 
 .author {
   font-size: 14px;
@@ -109,7 +95,6 @@ body {
   font-size: 14px;
 }
 
-/* DESCRIPTION */
 #desc {
   margin-top: 10px;
   opacity: 0.8;
@@ -174,9 +159,16 @@ body {
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+/* ✅ FULL CONFIG (FIXED) */
 const firebaseConfig = {
-  apiKey: "AIzaSyD4...",
+  apiKey: "AIzaSyD4An6C8ZEdiJsohwo76QuRxv1hhjNmRlI",
+  authDomain: "mcspaceomega.firebaseapp.com",
+  projectId: "mcspaceomega",
+  storageBucket: "mcspaceomega.firebasestorage.app",
+  messagingSenderId: "984192110931",
+  appId: "1:984192110931:web:d7392a9815ab248c6391a6"
 };
+
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
@@ -201,19 +193,12 @@ const code = new URLSearchParams(window.location.search).get("code");
 const s = servers[code];
 
 if (s) {
-  document.getElementById("name").innerText = s.name;
-  document.getElementById("desc").innerText = s.desc;
-  document.getElementById("invite").value = code;
+  name.innerText = s.name;
+  desc.innerText = s.desc;
+  invite.value = code;
+  author.innerText = "by " + s.author;
 
-  document.getElementById("author").innerText = "by " + s.author;
-
-  if (verifiedUsers.includes(s.author)) {
-    document.getElementById("check").innerText = "✔";
-  }
-
-  const bg = document.getElementById("bg");
-  const heart = document.getElementById("heart");
-  const card = document.getElementById("card");
+  if (verifiedUsers.includes(s.author)) check.innerText = "✔";
 
   bg.src = "bg" + s.id + ".png";
   heart.src = "heart" + s.id + ".png";
@@ -225,7 +210,6 @@ if (s) {
   const ref = doc(db,"servers",code);
   getDoc(ref).then(snap=>{
     const visits = snap.exists()?snap.data().visits||0:0;
-
     if (visits >= 5) {
       card.classList.add("trending");
       const b=document.createElement("div");
@@ -246,16 +230,6 @@ if (s) {
 
   document.title = s.name + " • MCspace";
 }
-
-/* COPY */
-window.copyCode = function() {
-  navigator.clipboard.writeText(document.getElementById("invite").value);
-};
-
-/* BACK */
-window.goBack = function() {
-  window.location.href = "index.html";
-};
 </script>
 
 </body>
