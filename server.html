@@ -17,6 +17,7 @@ body {
   background: radial-gradient(circle at top, #ffffff, #f3e8ff);
 }
 
+/* BACK BUTTON */
 .back {
   padding: 10px 16px;
   border-radius: 12px;
@@ -25,8 +26,15 @@ body {
   color: white;
   margin: 20px;
   cursor: pointer;
+  transition: 0.25s;
 }
+.back:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 8px 20px rgba(168,85,247,0.4);
+}
+.back:active { transform: scale(0.9); }
 
+/* CARD */
 .card {
   max-width: 1000px;
   margin: auto;
@@ -40,36 +48,34 @@ body {
 .card.trending { border: 2px solid red; }
 .card.recommended { border: 2px solid cyan; }
 
+/* BADGES */
 .badge {
   position: absolute;
   top: 15px;
+  left: 15px;
   padding: 6px 10px;
   border-radius: 10px;
   font-size: 12px;
   color: white;
 }
 
-.badge.trending {
-  left: 15px;
-  background: red;
-}
+.badge.trending { background: red; }
 
 .badge.recommended {
-  left: 15px;
-  top: 45px;
   background: linear-gradient(90deg, #00e5ff, #00ffa6);
   color: black;
+  top: 15px;
 }
 
+/* IMAGE */
 .bg {
   width: 100%;
   aspect-ratio: 16/9;
   object-fit: cover;
 }
 
-.content {
-  padding: 25px;
-}
+/* CONTENT */
+.content { padding: 25px; }
 
 .title-row {
   display: flex;
@@ -78,9 +84,7 @@ body {
   flex-wrap: wrap;
 }
 
-.title-row img {
-  width: 26px;
-}
+.title-row img { width: 26px; }
 
 .author {
   width: 100%;
@@ -93,11 +97,13 @@ body {
   height: 16px;
 }
 
+/* DESC */
 #desc {
   margin-top: 10px;
   opacity: 0.85;
 }
 
+/* INVITE */
 .invite {
   display: flex;
   margin-top: 20px;
@@ -114,10 +120,17 @@ body {
 .invite button {
   padding: 12px;
   border: 2px solid #a855f7;
-  background: #a855f7;
+  background: linear-gradient(135deg, #a855f7, #7e22ce);
   color: white;
   border-radius: 0 12px 12px 0;
   cursor: pointer;
+  transition: 0.25s;
+}
+.invite button:hover {
+  transform: translateY(-2px);
+}
+.invite button:active {
+  transform: scale(0.9);
 }
 </style>
 </head>
@@ -148,8 +161,9 @@ body {
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+/* FULL CONFIG */
 const firebaseConfig = {
   apiKey: "AIzaSyD4An6C8ZEdiJsohwo76QuRxv1hhjNmRlI",
   authDomain: "mcspaceomega.firebaseapp.com",
@@ -163,99 +177,43 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 const verifiedUsers = ["RedWorld"];
-
 const recommendedServers = ["M5R9X1NY"];
 
+/* ✅ SERVERS (WITH BG + HEART) */
 const servers = {
-  "M5R9X1NY": {
-    id:1,
-    name:"Erratic SMP",
-    desc:"Good MultiCraft SMP with no areas, and more very cool features.",
-    author:"RedWorld"
-  },
-  "KAAYBNDP": {
-    id:2,
-    name:"Ronaldo Vs Messi",
-    desc:"BEST SERVER 👌, PARKOUR / PvP / MINI GAMES / BEDWARS / MANHUNT / TREASURE HUNT / BRIDGING / AXE PVP / AND MANY MORE .. ✨",
-    author:"Elder"
-  },
-  "MCSRVR03": {
-    id:3,
-    name:"FlatWorld",
-    desc:"Creative Server",
-    author:"Unknown"
-  },
-  "JLIVC3V9": {
-    id:4,
-    name:"New Types PvP",
-    desc:"Awesome PvP server, with a lot fun features and gamemodes.",
-    author:"Unknown"
-  },
-  "94D92LVD": {
-    id:5,
-    name:"SMP12",
-    desc:"In here, it's your job to have fun! The world open, PVP; it's a place where you can do anything!",
-    author:"Jared12"
-  },
-  "XX9IXQ6H": {
-    id:6,
-    name:"Stone Simulator",
-    desc:"In here, we live underground! Also, we buy items from The Shop! With currencies such as Stone, Cobblestone, and more!",
-    author:"Jared12"
-  },
-  "QVZACNG5": {
-    id:7,
-    name:"Parkour Cubicles",
-    desc:"In here, YOU will try to beat the impossible 36 cubicles of the server to escape!",
-    author:"Jared12"
-  }
+  "M5R9X1NY": {name:"Erratic SMP",desc:"Good MultiCraft SMP with no areas, and more very cool features.",author:"RedWorld",bg:"bgs/bg1.png",heart:"hearts/hpvp.png"},
+  "KAAYBNDP": {name:"Ronaldo Vs Messi",desc:"BEST SERVER 👌, PARKOUR / PvP / MINI GAMES...",author:"Elder",bg:"bgs/bg2.png",heart:"hearts/hpvp.png"},
+  "MCSRVR03": {name:"FlatWorld",desc:"Creative server where you can build anything you want.",author:"Unknown",bg:"bgs/bg3.png",heart:"hearts/hc.png"},
+  "JLIVC3V9": {name:"New Types PvP",desc:"Awesome PvP server with many gamemodes.",author:"Unknown",bg:"bgs/bg4.png",heart:"hearts/hpvp.png"},
+  "94D92LVD": {name:"SMP12",desc:"Open world SMP where you can do anything!",author:"Jared12",bg:"bgs/bg5.png",heart:"hearts/hpvp.png"},
+  "XX9IXQ6H": {name:"Stone Simulator",desc:"Mine, trade and live underground economy.",author:"Jared12",bg:"bgs/bg6.png",heart:"hearts/hpvp.png"},
+  "QVZACNG5": {name:"Parkour Cubicles",desc:"Beat all 36 cubicles if you can!",author:"Jared12",bg:"bgs/bg7.png",heart:"hearts/hpvp.png"}
 };
-
-function loadImage(img, base){
-  const formats = ["webp","png","PNG","WEBP"];
-  let i = 0;
-  function next(){
-    if(i >= formats.length) return;
-    img.src = base + "." + formats[i];
-    i++;
-  }
-  img.onerror = next;
-  next();
-}
 
 const code = new URLSearchParams(location.search).get("code");
 const s = servers[code];
 
 if(!s){
-  document.getElementById("name").innerText = "Server not found";
+  name.innerText = "Server not found";
   throw "invalid";
 }
 
-const nameEl = document.getElementById("name");
-const descEl = document.getElementById("desc");
-const inviteEl = document.getElementById("invite");
-const authorEl = document.getElementById("author");
-const checkEl = document.getElementById("check");
-const bgEl = document.getElementById("bg");
-const heartEl = document.getElementById("heart");
-const card = document.getElementById("card");
-
-nameEl.innerText = s.name;
-descEl.innerText = s.desc;
-inviteEl.value = code;
-authorEl.innerText = "by " + s.author;
+/* SET DATA */
+name.innerText = s.name;
+desc.innerText = s.desc;
+invite.value = code;
+author.innerText = "by " + s.author;
 
 if(verifiedUsers.includes(s.author)){
-  checkEl.src = "assets/check.png"; 
-  checkEl.style.display = "inline";
+  check.src = "assets/check.png";
+  check.style.display = "inline";
 }
 
-if(s.bg) bgEl.src = s.bg;
-else loadImage(bgEl, "bgs/bg" + s.id);
+/* IMAGES */
+bg.src = s.bg;
+heart.src = s.heart;
 
-if(s.heart) heartEl.src = s.heart;
-else loadImage(heartEl, "hearts/h" + s.id);
-
+/* BADGES */
 const ref = doc(db,"servers",code);
 getDoc(ref).then(snap=>{
   const visits = snap.exists()?snap.data().visits||0:0;
@@ -278,10 +236,12 @@ getDoc(ref).then(snap=>{
   }
 });
 
+/* COPY */
 window.copyCode = ()=>{
-  navigator.clipboard.writeText(inviteEl.value);
+  navigator.clipboard.writeText(invite.value);
 };
 
+/* BACK */
 window.goBack = ()=>{
   location.href = "index.html";
 };
