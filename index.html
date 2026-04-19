@@ -1,3 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MCspace</title>
+
+<style>
+@font-face {
+  font-family: 'MultiCraft';
+  src: url('MultiCraft.ttf');
+}
+
+body {
+  margin: 0;
+  font-family: 'MultiCraft', sans-serif;
+  background: radial-gradient(circle at top, #ffffff, #f3e8ff);
+  color: #2d0b4e;
+}
+
+/* HEADER */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 25px;
+  border-bottom: 2px solid #a855f7;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo img {
+  height: 40px;
+}
+
+/* ADD BUTTON */
+.add-btn {
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 2px solid #a855f7;
+  background: linear-gradient(135deg, #a855f7, #7e22ce);
+  color: white;
+  cursor: pointer;
+}
+
+/* GRID */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 25px;
+  padding: 30px;
+}
+
+/* CARD */
+.card {
+  border-radius: 20px;
+  overflow: hidden;
+  background: white;
+  box-shadow: 0 15px 35px rgba(168,85,247,0.25);
+  border: 2px solid transparent;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* TRENDING */
+.card.trending {
+  border: 2px solid red;
+}
+
+/* RECOMMENDED */
+.card.recommended {
+  border: 2px solid cyan;
+}
+
+/* BADGES */
+.badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 10px;
+  color: white;
+}
+
+.badge.trending {
+  background: red;
+}
+
+.badge.recommended {
+  background: cyan;
+  color: black;
+  top: 35px;
+}
+
+/* IMAGE */
+.bg {
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+}
+
+/* CONTENT */
+.content {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+/* AUTHOR */
+.author {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.check {
+  color: cyan;
+  font-size: 12px;
+}
+
+/* DESC */
+.desc {
+  font-size: 13px;
+  opacity: 0.7;
+  margin-top: 5px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ACTIONS */
+.actions {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.visits {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+/* BUTTON */
+.play-btn {
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 2px solid #a855f7;
+  background: linear-gradient(135deg, #a855f7, #7e22ce);
+  color: white;
+  cursor: pointer;
+}
+
+/* MODAL */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.4);
+}
+
+.modal-box {
+  background: white;
+  padding: 25px;
+  border-radius: 20px;
+  text-align: center;
+  max-width: 320px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <div class="logo">
+    <img src="logo.png">
+    <div>MCspace</div>
+  </div>
+
+  <button class="add-btn" onclick="openModal()">+ Add my server</button>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<div id="modal" class="modal">
+  <div class="modal-box">
+    <h3>Want to add your server?</h3>
+    <p>DM @rwor1d in Discord to add your server.</p>
+    <button onclick="closeModal()">Close</button>
+  </div>
+</div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, doc, getDoc, setDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
