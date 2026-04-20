@@ -2,39 +2,51 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MCSpace</title>
 
 <style>
 @font-face {
-  font-family:'MultiCraft';
-  src:url('assets/MultiCraft.ttf');
+  font-family: 'MultiCraft';
+  src: url('assets/MultiCraft.ttf');
 }
 
 body {
-  margin:0;
-  font-family:'MultiCraft';
-  background:radial-gradient(circle at top,#fff,#f3e8ff);
+  margin: 0;
+  font-family: 'MultiCraft', sans-serif;
+  background: radial-gradient(circle at top, #ffffff, #f3e8ff);
+  color: #2d0b4e;
 }
 
+/* HEADER */
 .header {
   display:flex;
   justify-content:space-between;
+  align-items:center;
   padding:15px 25px;
   border-bottom:2px solid #a855f7;
 }
 
-.logo {display:flex;gap:10px;align-items:center;}
-.logo img {height:40px;}
+.logo { display:flex; align-items:center; gap:10px; }
+.logo img { height:40px; }
 
-.add-btn {
+/* BUTTON */
+.add-btn, .play-btn {
   padding:10px 16px;
   border-radius:12px;
   border:2px solid #a855f7;
   background:linear-gradient(135deg,#a855f7,#7e22ce);
   color:white;
   cursor:pointer;
+  transition:0.25s;
 }
+.add-btn:hover,.play-btn:hover{
+  transform:translateY(-2px) scale(1.05);
+  box-shadow:0 8px 20px rgba(168,85,247,0.4);
+}
+.add-btn:active,.play-btn:active{ transform:scale(0.9); }
 
+/* GRID */
 .grid {
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
@@ -42,78 +54,97 @@ body {
   padding:30px;
 }
 
+/* CARD */
 .card {
-  background:white;
   border-radius:20px;
   overflow:hidden;
-  box-shadow:0 10px 30px rgba(0,0,0,0.1);
+  background:white;
+  box-shadow:0 15px 35px rgba(168,85,247,0.25);
+  display:flex;
+  flex-direction:column;
   position:relative;
 }
 
+.card.trending { border:2px solid red; }
+.card.recommended { border:2px solid cyan; }
+
+/* BADGES */
 .badge {
   position:absolute;
   top:10px;
   left:10px;
   padding:5px 10px;
-  border-radius:8px;
+  border-radius:10px;
+  font-size:11px;
   color:white;
 }
-
 .badge.trending { background:red; }
 .badge.recommended {
   background:linear-gradient(90deg,#00e5ff,#00ffa6);
   color:black;
 }
 
-.bg { width:100%; aspect-ratio:16/9; object-fit:cover; }
+/* IMAGE */
+.bg {
+  width:100%;
+  aspect-ratio:16/9;
+  object-fit:cover;
+}
 
-.content { padding:12px; display:flex; flex-direction:column; }
+/* CONTENT */
+.content { padding:12px; display:flex; flex-direction:column; flex:1; }
 
-.name { font-weight:bold; word-break:break-word; }
+.title-row { display:flex; gap:6px; align-items:center; }
 
+.name {
+  font-weight:bold;
+  font-size:14px;
+  word-break:break-word;
+}
+
+/* AUTHOR */
 .author {
   font-size:12px;
   opacity:0.7;
   margin-top:4px;
+  display:flex;
+  gap:5px;
+  align-items:center;
 }
 
+.check { width:14px; }
+
+/* DESC */
 .desc {
   font-size:13px;
   opacity:0.7;
   margin-top:6px;
 }
 
+/* ACTIONS */
 .actions {
   margin-top:auto;
   display:flex;
   justify-content:space-between;
+  align-items:center;
 }
 
-.play-btn {
-  background:#a855f7;
-  color:white;
-  padding:6px 12px;
-  border-radius:8px;
-  cursor:pointer;
-}
-
+/* MODAL FIXED */
 .modal {
   position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
+  top:0; left:0;
+  width:100%; height:100%;
   display:none;
-  justify-content:center;
   align-items:center;
+  justify-content:center;
   background:rgba(0,0,0,0.4);
-  z-index:9999;
+  z-index:999;
 }
-
 .modal-box {
   background:white;
-  padding:20px;
-  border-radius:12px;
+  padding:25px;
+  border-radius:20px;
+  text-align:center;
 }
 </style>
 </head>
@@ -125,7 +156,6 @@ body {
     <img src="assets/logo.png">
     <div>MCSpace</div>
   </div>
-
   <button class="add-btn" onclick="openModal()">+ Add my server</button>
 </div>
 
@@ -134,60 +164,108 @@ body {
 <div id="modal" class="modal">
   <div class="modal-box">
     <h3>Add your server</h3>
-    <p>DM @rwo1ld in Discord</p>
-    <button onclick="closeModal()">Close</button>
+    <p>DM @rwo1ld in Discord to add your server.</p>
+    <button class="add-btn" onclick="closeModal()">Close</button>
   </div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey:"AIzaSyD4An6C8ZEdiJsohwo76QuRxv1hhjNmRlI",
-  authDomain:"mcspaceomega.firebaseapp.com",
-  projectId:"mcspaceomega",
-  storageBucket:"mcspaceomega.firebasestorage.app",
-  messagingSenderId:"984192110931",
-  appId:"1:984192110931:web:d7392a9815ab248c6391a6"
+  apiKey: "AIzaSyD4An6C8ZEdiJsohwo76QuRxv1hhjNmRlI",
+  authDomain: "mcspaceomega.firebaseapp.com",
+  projectId: "mcspaceomega",
+  storageBucket: "mcspaceomega.firebasestorage.app",
+  messagingSenderId: "984192110931",
+  appId: "1:984192110931:web:d7392a9815ab248c6391a6"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-const recommendedServers=["M5R9X1NY"];
+const verifiedUsers = ["RedWorld"];
+const recommendedServers = ["M5R9X1NY"];
 
-const servers=[
-{ id:1,name:"Erratic SMP",code:"M5R9X1NY",author:"RedWorld",desc:"Good MultiCraft SMP with no areas, and more very cool features.",bg:"bgs/bg1.png",heart:"hearts/hpvp.png"},
-{ id:2,name:"Ronaldo Vs Messi",code:"KAAYBNDP",author:"Elder",desc:"BEST SERVER 👌, PARKOUR / PvP / MINI GAMES / BEDWARS / MANHUNT / TREASURE HUNT / BRIDGING / AXE PVP / AND MANY MORE .. ✨",bg:"bgs/bg2.png",heart:"hearts/hpvp.png"},
-{ id:3,name:"FlatWorld",code:"MCSRVR03",author:"Unknown",desc:"Creative server where you can build anything you want.",bg:"bgs/bg3.png",heart:"hearts/hc.png"},
-{ id:4,name:"New Types PvP",code:"JLIVC3V9",author:"Unknown",desc:"Awesome PvP server with a lot fun features and gamemodes.",bg:"bgs/bg4.png",heart:"hearts/hpvp.png"},
-{ id:5,name:"SMP12",code:"94D92LVD",author:"Jared12",desc:"In here, it's your job to have fun! The world open, PVP; it's a place where you can do anything!",bg:"bgs/bg5.png",heart:"hearts/hpvp.png"},
-{ id:6,name:"Stone Simulator",code:"XX9IXQ6H",author:"Jared12",desc:"In here, we live underground! Also, we buy items from The Shop!",bg:"bgs/bg6.png",heart:"hearts/hpvp.png"},
-{ id:7,name:"Parkour Cubicles",code:"QVZACNG5",author:"Jared12",desc:"Beat all 36 cubicles!",bg:"bgs/bg7.png",heart:"hearts/hpvp.png"}
+/* FULL SERVERS */
+let servers = [
+{
+id:1,name:"Erratic SMP",
+desc:"A high-quality MultiCraft survival server with no protected areas. Explore freely, build anything, and enjoy custom features designed to improve survival gameplay. Active players and constant updates.",
+code:"M5R9X1NY",author:"RedWorld",
+bg:"bgs/bg1.png",heart:"hearts/hpvp.png"
+},
+{
+id:2,name:"Ronaldo Vs Messi",
+desc:"Competitive server with parkour, PvP, BedWars, bridging, treasure hunts and more. Designed for skilled players who want challenges, fast gameplay, and intense battles.",
+code:"KAAYBNDP",author:"Elder",
+bg:"bgs/bg2.png",heart:"hearts/hpvp.png"
+},
+{
+id:3,name:"FlatWorld",
+desc:"A creative flat world where you can freely build anything you imagine. No limits, no pressure — just pure building and creativity.",
+code:"MCSRVR03",author:"Unknown",
+bg:"bgs/bg3.png",heart:"hearts/hc.png"
+},
+{
+id:4,name:"New Types PvP",
+desc:"Unique PvP experience with custom mechanics, multiple combat styles, and fun gamemodes that keep fights fresh and exciting.",
+code:"JLIVC3V9",author:"Unknown",
+bg:"bgs/bg4.png",heart:"hearts/hpvp.png"
+},
+{
+id:5,name:"SMP12",
+desc:"An open survival world where players can explore, fight, build, and create their own story. PvP enabled and full freedom.",
+code:"94D92LVD",author:"Jared12",
+bg:"bgs/bg5.png",heart:"hearts/hpvp.png"
+},
+{
+id:6,name:"Stone Simulator",
+desc:"Live underground, mine resources, trade items, and build your wealth using stone-based currencies in a unique economy system.",
+code:"XX9IXQ6H",author:"Jared12",
+bg:"bgs/bg6.png",heart:"hearts/hpvp.png"
+},
+{
+id:7,name:"Parkour Cubicles",
+desc:"Challenge yourself with 36 increasingly difficult parkour cubicles. Only skilled players can complete all levels.",
+code:"QVZACNG5",author:"Jared12",
+bg:"bgs/bg7.png",heart:"hearts/hpvp.png"
+}
 ];
 
-async function init(){
-  let data=[];
-
-  for(const s of servers){
-    const snap=await getDoc(doc(db,"servers",s.code));
-    const visits=snap.exists()?snap.data().visits||0:0;
-    const last=snap.exists()?snap.data().lastVisits||0:0;
-
-    data.push({...s,visits,growth:visits-last});
+async function loadVisits(s){
+  const snap = await getDoc(doc(db,"servers",s.code));
+  if(snap.exists()){
+    const d = snap.data();
+    s.visits = d.visits || 0;
+    s.lastVisits = d.lastVisits || 0;
+  } else {
+    s.visits = 0;
+    s.lastVisits = 0;
   }
+  s.growth = s.visits - s.lastVisits;
+}
 
-  const maxGrowth=Math.max(...data.map(s=>s.growth));
+async function init(){
+  await Promise.all(servers.map(loadVisits));
+
+  const maxGrowth = Math.max(...servers.map(s=>s.growth));
+
+  servers.sort((a,b)=>b.visits-a.visits);
 
   const grid=document.getElementById("grid");
+  grid.innerHTML="";
 
-  data.forEach(s=>{
-    const recommended=recommendedServers.includes(s.code);
-    const trending=!recommended && s.growth >= maxGrowth*0.6 && s.growth>0;
+  servers.forEach(s=>{
+    const recommended = recommendedServers.includes(s.code);
+    const trending = !recommended && s.growth >= Math.max(2, maxGrowth * 0.5);
+    const verified = verifiedUsers.includes(s.author);
 
     const card=document.createElement("div");
-    card.className="card";
+    card.className="card"+
+      (recommended?" recommended":"")+
+      (trending?" trending":"");
 
     card.innerHTML=`
       ${recommended?'<div class="badge recommended">RECOMMENDED</div>':''}
@@ -195,13 +273,21 @@ async function init(){
 
       <img class="bg" src="${s.bg}">
       <div class="content">
-        <div class="name">${s.name}</div>
-        <div class="author">by ${s.author}</div>
+        <div class="title-row">
+          <img src="${s.heart}" width="18">
+          <div class="name">${s.name}</div>
+        </div>
+
+        <div class="author">
+          by ${s.author}
+          ${verified?'<img class="check" src="assets/check.png">':''}
+        </div>
+
         <div class="desc">${s.desc}</div>
 
         <div class="actions">
           <div>${s.visits} visits</div>
-          <div class="play-btn" onclick="location.href='server.html?code=${s.code}'">Play</div>
+          <div class="play-btn" onclick="joinServer('${s.code}')">Play</div>
         </div>
       </div>
     `;
@@ -209,6 +295,16 @@ async function init(){
     grid.appendChild(card);
   });
 }
+
+window.joinServer = async(code)=>{
+  const ref = doc(db,"servers",code);
+  try{
+    await updateDoc(ref,{visits:increment(1)});
+  }catch{
+    await setDoc(ref,{visits:1,lastVisits:0});
+  }
+  location.href="server.html?code="+code;
+};
 
 window.openModal=()=>modal.style.display="flex";
 window.closeModal=()=>modal.style.display="none";
