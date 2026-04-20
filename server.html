@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MCspace</title>
+<title>Loading...</title>
 
 <style>
 @font-face {
@@ -17,6 +17,7 @@ body {
   background: radial-gradient(circle at top,#ffffff,#f3e8ff);
 }
 
+/* BUTTONS */
 .back,.copy-btn{
   padding:10px 16px;
   border-radius:12px;
@@ -24,9 +25,23 @@ body {
   background:linear-gradient(135deg,#a855f7,#7e22ce);
   color:white;
   cursor:pointer;
+  transition:0.25s;
+}
+
+.back{
   margin:20px;
 }
 
+.back:hover,.copy-btn:hover{
+  transform:translateY(-2px) scale(1.05);
+  box-shadow:0 8px 20px rgba(168,85,247,0.4);
+}
+
+.back:active,.copy-btn:active{
+  transform:scale(0.9);
+}
+
+/* CARD */
 .card{
   max-width:900px;
   margin:auto;
@@ -60,9 +75,16 @@ body {
   width:16px;
 }
 
+/* INVITE */
+.invite-label{
+  margin-top:20px;
+  opacity:0.7;
+  font-size:14px;
+}
+
 .invite{
   display:flex;
-  margin-top:20px;
+  margin-top:6px;
 }
 
 .invite input{
@@ -71,6 +93,8 @@ body {
   border:2px solid #a855f7;
   border-right:none;
   border-radius:12px 0 0 12px;
+  outline:none;
+  font-family:'MultiCraft';
 }
 
 .copy-btn{
@@ -85,6 +109,7 @@ body {
 
 <div class="card">
   <img id="bg" class="bg">
+
   <div class="content">
     <div class="title-row">
       <img id="heart" width="24">
@@ -95,8 +120,10 @@ body {
 
     <p id="desc"></p>
 
+    <div class="invite-label">Invite Code</div>
+
     <div class="invite">
-      <input id="invite" readonly>
+      <input id="invite" readonly onclick="this.select()">
       <button class="copy-btn" onclick="copyCode()">Copy</button>
     </div>
   </div>
@@ -118,6 +145,61 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+/* LOCAL SERVER DATA (FULL, FIXED) */
+const servers = {
+  "M5R9X1NY": {
+    name:"Erratic SMP",
+    desc:"Good MultiCraft SMP with no areas, survival gameplay, active players, and many cool features to explore with friends.",
+    author:"RedWorld",
+    bg:"bgs/bg1.png",
+    heart:"hearts/hpvp.png"
+  },
+  "KAAYBNDP": {
+    name:"Ronaldo Vs Messi",
+    desc:"BEST SERVER 👌 Includes parkour, PvP, minigames, BedWars, Manhunt, treasure hunt, bridging, axe PvP, and many more fun modes.",
+    author:"Elder",
+    bg:"bgs/bg2.png",
+    heart:"hearts/hpvp.png"
+  },
+  "MCSRVR03": {
+    name:"FlatWorld",
+    desc:"Creative server where you can freely build anything in a flat world environment without limits.",
+    author:"Unknown",
+    bg:"bgs/bg3.png",
+    heart:"hearts/hc.png"
+  },
+  "JLIVC3V9": {
+    name:"New Types PvP",
+    desc:"Awesome PvP server with many fun features, unique combat styles, and different gamemodes to enjoy.",
+    author:"Unknown",
+    bg:"bgs/bg4.png",
+    heart:"hearts/hpvp.png"
+  },
+  "94D92LVD": {
+    name:"SMP12",
+    desc:"Open world SMP where you can explore, fight, build, and do anything you want with PvP enabled.",
+    author:"Jared12",
+    bg:"bgs/bg5.png",
+    heart:"hearts/hpvp.png"
+  },
+  "XX9IXQ6H": {
+    name:"Stone Simulator",
+    desc:"Underground survival server with economy. Mine stone, trade resources, and progress through a unique system.",
+    author:"Jared12",
+    bg:"bgs/bg6.png",
+    heart:"hearts/hpvp.png"
+  },
+  "QVZACNG5": {
+    name:"Parkour Cubicles",
+    desc:"Challenge yourself by completing 36 difficult parkour cubicles and try to escape the impossible map.",
+    author:"Jared12",
+    bg:"bgs/bg7.png",
+    heart:"hearts/hpvp.png"
+  }
+};
+
+const verifiedUsers = ["RedWorld"];
+
 // elements
 const nameEl = document.getElementById("name");
 const descEl = document.getElementById("desc");
@@ -127,53 +209,51 @@ const bgEl = document.getElementById("bg");
 const heartEl = document.getElementById("heart");
 const checkEl = document.getElementById("check");
 
-// get code from URL
-const code = new URLSearchParams(window.location.search).get("code");
+// get code
+const code = new URLSearchParams(location.search).get("code");
+const s = servers[code];
 
-if (!code) {
-  nameEl.innerText = "No code provided";
+if(!s){
+  nameEl.innerText = "Server not found";
+  descEl.innerText = "Invalid invite code.";
 } else {
-  loadServer(code);
+  loadServer(s);
 }
 
-async function loadServer(code) {
-  try {
-    const ref = doc(db, "servers", code);
-    const snap = await getDoc(ref);
+async function loadServer(s){
+  nameEl.innerText = s.name;
+  descEl.innerText = s.desc;
+  authorEl.innerText = "by " + s.author;
+  inviteEl.value = code;
 
-    if (!snap.exists()) {
-      nameEl.innerText = "Server not found";
-      descEl.innerText = "Invalid code.";
-      return;
+  bgEl.src = s.bg;
+  heartEl.src = s.heart;
+
+  if(verifiedUsers.includes(s.author)){
+    checkEl.src = "assets/check.png";
+    checkEl.style.display = "inline";
+  }
+
+  document.title = s.name + " • MCspace";
+
+  // optional: fetch visits (doesn't break UI if fails)
+  try{
+    const snap = await getDoc(doc(db,"servers",code));
+    if(snap.exists()){
+      const visits = snap.data().visits || 0;
+      console.log("Visits:", visits);
     }
-
-    const server = snap.data();
-
-    nameEl.innerText = server.name;
-    descEl.innerText = server.desc;
-    authorEl.innerText = "by " + server.author;
-    inviteEl.value = code;
-
-    bgEl.src = server.bg;
-    heartEl.src = server.heart;
-
-    if (server.author === "RedWorld") {
-      checkEl.src = "assets/check.png";
-      checkEl.style.display = "inline";
-    }
-
-    document.title = server.name + " • MCspace";
-
-  } catch (err) {
-    console.error(err);
-    nameEl.innerText = "Error loading server";
+  }catch(e){
+    console.warn("Visits load failed");
   }
 }
 
-window.copyCode = function () {
-  navigator.clipboard.writeText(inviteEl.value)
-    .then(() => alert("Copied!"))
-    .catch(() => alert("Failed to copy"));
+/* COPY BUTTON (clean) */
+window.copyCode = function(){
+  navigator.clipboard.writeText(inviteEl.value);
+  const btn = document.querySelector(".copy-btn");
+  btn.innerText = "Copied!";
+  setTimeout(()=>btn.innerText="Copy",1200);
 };
 </script>
 
