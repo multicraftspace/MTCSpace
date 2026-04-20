@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="refresh" content="0; url=https://multicraftspace.github.io/c2.html">
-<title>Loading...</title>
+<title>MCspace</title>
 
 <style>
 @font-face {
@@ -14,7 +13,7 @@
 
 body {
   margin:0;
-  font-family:'MultiCraft';
+  font-family:'MultiCraft', sans-serif;
   background: radial-gradient(circle at top,#ffffff,#f3e8ff);
 }
 
@@ -45,13 +44,26 @@ body {
 
 .content{padding:25px;}
 
-.title-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.title-row{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  flex-wrap:wrap;
+}
 
-.author{width:100%;opacity:0.7;}
+.author{
+  width:100%;
+  opacity:0.7;
+}
 
-.check{width:16px;}
+.check{
+  width:16px;
+}
 
-.invite{display:flex;margin-top:20px;}
+.invite{
+  display:flex;
+  margin-top:20px;
+}
 
 .invite input{
   flex:1;
@@ -76,7 +88,7 @@ body {
   <div class="content">
     <div class="title-row">
       <img id="heart" width="24">
-      <h2 id="name"></h2>
+      <h2 id="name">Loading...</h2>
       <img id="check" class="check" style="display:none;">
       <div id="author" class="author"></div>
     </div>
@@ -90,53 +102,53 @@ body {
   </div>
 </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-
-const firebaseConfig={
-  apiKey:"AIzaSyD4An6C8ZEdiJsohwo76QuRxv1hhjNmRlI",
-  authDomain:"mcspaceomega.firebaseapp.com",
-  projectId:"mcspaceomega",
-  storageBucket:"mcspaceomega.firebasestorage.app",
-  messagingSenderId:"984192110931",
-  appId:"1:984192110931:web:d7392a9815ab248c6391a6"
+<script>
+const servers = {
+"M5R9X1NY": {name:"Erratic SMP",desc:"Good MultiCraft SMP with no areas, and more very cool features.",author:"RedWorld",bg:"bgs/bg1.png",heart:"hearts/hpvp.png"},
+"KAAYBNDP": {name:"Ronaldo Vs Messi",desc:"BEST SERVER 👌, PARKOUR / PvP / MINI GAMES / BEDWARS / MANHUNT / TREASURE HUNT / BRIDGING / AXE PVP / AND MANY MORE .. ✨",author:"Elder",bg:"bgs/bg2.png",heart:"hearts/hpvp.png"},
+"MCSRVR03": {name:"FlatWorld",desc:"Creative Server",author:"Unknown",bg:"bgs/bg3.png",heart:"hearts/hc.png"},
+"JLIVC3V9": {name:"New Types PvP",desc:"Awesome PvP server, with a lot fun features and gamemodes.",author:"Unknown",bg:"bgs/bg4.png",heart:"hearts/hpvp.png"},
+"94D92LVD": {name:"SMP12",desc:"In here, it's your job to have fun!",author:"Jared12",bg:"bgs/bg5.png",heart:"hearts/hpvp.png"},
+"XX9IXQ6H": {name:"Stone Simulator",desc:"We live underground and trade items!",author:"Jared12",bg:"bgs/bg6.png",heart:"hearts/hpvp.png"},
+"QVZACNG5": {name:"Parkour Cubicles",desc:"Try to beat all 36 cubicles!",author:"Jared12",bg:"bgs/bg7.png",heart:"hearts/hpvp.png"}
 };
 
-initializeApp(firebaseConfig);
+const nameEl = document.getElementById("name");
+const descEl = document.getElementById("desc");
+const authorEl = document.getElementById("author");
+const inviteEl = document.getElementById("invite");
+const bgEl = document.getElementById("bg");
+const heartEl = document.getElementById("heart");
+const checkEl = document.getElementById("check");
 
-const servers={
-"M5R9X1NY":{name:"Erratic SMP",desc:"Good MultiCraft SMP with no areas, and more very cool features.",author:"RedWorld",bg:"bgs/bg1.png",heart:"hearts/hpvp.png"},
-"KAAYBNDP":{name:"Ronaldo Vs Messi",desc:"BEST SERVER 👌, PARKOUR / PvP / MINI GAMES / BEDWARS / MANHUNT / TREASURE HUNT / BRIDGING / AXE PVP / AND MANY MORE .. ✨",author:"Elder",bg:"bgs/bg2.png",heart:"hearts/hpvp.png"},
-"MCSRVR03":{name:"FlatWorld",desc:"Creative Server",author:"Unknown",bg:"bgs/bg3.png",heart:"hearts/hc.png"},
-"JLIVC3V9":{name:"New Types PvP",desc:"Awesome PvP server, with a lot fun features and gamemodes.",author:"Unknown",bg:"bgs/bg4.png",heart:"hearts/hpvp.png"},
-"94D92LVD":{name:"SMP12",desc:"In here, it's your job to have fun! The world open, PVP; it's a place where you can do anything!",author:"Jared12",bg:"bgs/bg5.png",heart:"hearts/hpvp.png"},
-"XX9IXQ6H":{name:"Stone Simulator",desc:"In here, we live underground! Also, we buy items from The Shop! With currencies such as Stone, Cobblestone, and more!",author:"Jared12",bg:"bgs/bg6.png",heart:"hearts/hpvp.png"},
-"QVZACNG5":{name:"Parkour Cubicles",desc:"In here, YOU will try to beat the impossible 36 cubicles of the server to escape!",author:"Jared12",bg:"bgs/bg7.png",heart:"hearts/hpvp.png"}
-};
+const code = new URLSearchParams(window.location.search).get("code");
+const server = servers[code];
 
-const code=new URLSearchParams(location.search).get("code");
-const s=servers[code];
-
-if(!s){
-  document.getElementById("name").innerText="Server not found";
+if (!server) {
+  nameEl.innerText = "Server not found";
+  descEl.innerText = "Invalid or missing code.";
 } else {
-  name.innerText=s.name;
-  desc.innerText=s.desc;
-  author.innerText="by "+s.author;
-  invite.value=code;
+  nameEl.innerText = server.name;
+  descEl.innerText = server.desc;
+  authorEl.innerText = "by " + server.author;
+  inviteEl.value = code;
 
-  bg.src=s.bg;
-  heart.src=s.heart;
+  bgEl.src = server.bg;
+  heartEl.src = server.heart;
 
-  if(s.author==="RedWorld"){
-    check.src="assets/check.png";
-    check.style.display="inline";
+  if (server.author === "RedWorld") {
+    checkEl.src = "assets/check.png";
+    checkEl.style.display = "inline";
   }
 
-  document.title=s.name+" • MCspace";
+  document.title = server.name + " • MCspace";
 }
 
-window.copyCode=()=>navigator.clipboard.writeText(invite.value);
+function copyCode() {
+  navigator.clipboard.writeText(inviteEl.value)
+    .then(() => alert("Copied!"))
+    .catch(() => alert("Failed to copy"));
+}
 </script>
 
 </body>
