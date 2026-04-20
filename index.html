@@ -268,11 +268,34 @@ async function init(){
   });
 }
 
-window.joinServer=async(code)=>{
-  const ref=doc(db,"servers",code);
-  try{await updateDoc(ref,{visits:increment(1)});}
-  catch{await setDoc(ref,{visits:1,lastVisits:0});}
-  location.href="server.html?code="+code;
+const COOLDOWN = 10 * 60 * 1000; // 10 min
+
+window.joinServer = async function(code){
+  const key = "visit_" + code;
+  const now = Date.now();
+  const last = localStorage.getItem(key);
+
+  let canCount = true;
+
+  if (last && now - last < COOLDOWN) {
+    canCount = false;
+  }
+
+  if (canCount) {
+    const ref = doc(db,"servers",code);
+
+    try {
+      await updateDoc(ref, { visits: increment(1) });
+    } catch {
+      await setDoc(ref, { visits: 1 });
+    }
+
+    localStorage.setItem(key, now);
+  } else {
+    console.log("Cooldown active, visit not counted");
+  }
+
+  location.href = "server.html?code=" + code;
 };
 
 window.openModal=()=>modal.style.display="flex";
