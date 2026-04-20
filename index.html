@@ -220,6 +220,9 @@ async function loadVisits(s){
 async function init(){
   await Promise.all(servers.map(loadVisits));
 
+  // sort by VISITS (highest first)
+  servers.sort((a, b) => (b.visits || 0) - (a.visits || 0));
+
   const maxGrowth=Math.max(...servers.map(s=>s.growth));
 
   servers.forEach(s=>{
