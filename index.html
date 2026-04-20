@@ -12,14 +12,13 @@
 }
 
 body {
-  margin: 0;
-  font-family: 'MultiCraft', sans-serif;
-  background: radial-gradient(circle at top, #ffffff, #f3e8ff);
-  color: #2d0b4e;
+  margin:0;
+  font-family:'MultiCraft', sans-serif;
+  background: radial-gradient(circle at top,#ffffff,#f3e8ff);
+  color:#2d0b4e;
 }
 
-/* HEADER */
-.header {
+.header{
   display:flex;
   justify-content:space-between;
   align-items:center;
@@ -27,11 +26,10 @@ body {
   border-bottom:2px solid #a855f7;
 }
 
-.logo { display:flex; align-items:center; gap:10px; }
-.logo img { height:40px; }
+.logo{display:flex;align-items:center;gap:10px;}
+.logo img{height:40px;}
 
-/* BUTTON */
-.add-btn, .play-btn {
+.add-btn,.play-btn{
   padding:10px 16px;
   border-radius:12px;
   border:2px solid #a855f7;
@@ -44,18 +42,16 @@ body {
   transform:translateY(-2px) scale(1.05);
   box-shadow:0 8px 20px rgba(168,85,247,0.4);
 }
-.add-btn:active,.play-btn:active{ transform:scale(0.9); }
+.add-btn:active,.play-btn:active{transform:scale(0.9);}
 
-/* GRID */
-.grid {
+.grid{
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
   gap:25px;
   padding:30px;
 }
 
-/* CARD */
-.card {
+.card{
   border-radius:20px;
   overflow:hidden;
   background:white;
@@ -65,11 +61,10 @@ body {
   position:relative;
 }
 
-.card.trending { border:2px solid red; }
-.card.recommended { border:2px solid cyan; }
+.card.trending{border:2px solid red;}
+.card.recommended{border:2px solid cyan;}
 
-/* BADGES */
-.badge {
+.badge{
   position:absolute;
   top:10px;
   left:10px;
@@ -78,32 +73,34 @@ body {
   font-size:11px;
   color:white;
 }
-.badge.trending { background:red; }
-.badge.recommended {
+.badge.trending{background:red;}
+.badge.recommended{
   background:linear-gradient(90deg,#00e5ff,#00ffa6);
   color:black;
 }
 
-/* IMAGE */
-.bg {
+.bg{
   width:100%;
   aspect-ratio:16/9;
   object-fit:cover;
 }
 
-/* CONTENT */
-.content { padding:12px; display:flex; flex-direction:column; flex:1; }
+.content{
+  padding:12px;
+  display:flex;
+  flex-direction:column;
+  flex:1;
+}
 
-.title-row { display:flex; gap:6px; align-items:center; }
+.title-row{display:flex;gap:6px;align-items:center;}
 
-.name {
+.name{
   font-weight:bold;
   font-size:14px;
   word-break:break-word;
 }
 
-/* AUTHOR */
-.author {
+.author{
   font-size:12px;
   opacity:0.7;
   margin-top:4px;
@@ -112,35 +109,44 @@ body {
   align-items:center;
 }
 
-.check { width:14px; }
+.check{width:14px;}
 
-/* DESC */
-.desc {
+.desc{
   font-size:13px;
   opacity:0.7;
   margin-top:6px;
+  display:-webkit-box;
+  -webkit-line-clamp:3;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
 }
 
-/* ACTIONS */
-.actions {
+.actions{
   margin-top:auto;
   display:flex;
   justify-content:space-between;
   align-items:center;
 }
 
-/* MODAL FIXED */
-.modal {
+.visits{
+  font-size:12px;
+  opacity:0.7;
+  color:#2d0b4e;
+}
+
+/* MODAL */
+.modal{
   position:fixed;
-  top:0; left:0;
-  width:100%; height:100%;
+  top:0;left:0;
+  width:100%;height:100%;
   display:none;
   align-items:center;
   justify-content:center;
   background:rgba(0,0,0,0.4);
   z-index:999;
 }
-.modal-box {
+
+.modal-box{
   background:white;
   padding:25px;
   border-radius:20px;
@@ -174,102 +180,66 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import { getFirestore, doc, getDoc, setDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyD4An6C8ZEdiJsohwo76QuRxv1hhjNmRlI",
-  authDomain: "mcspaceomega.firebaseapp.com",
-  projectId: "mcspaceomega",
-  storageBucket: "mcspaceomega.firebasestorage.app",
-  messagingSenderId: "984192110931",
-  appId: "1:984192110931:web:d7392a9815ab248c6391a6"
+  apiKey:"AIzaSyD4An6C8ZEdiJsohwo76QuRxv1hhjNmRlI",
+  authDomain:"mcspaceomega.firebaseapp.com",
+  projectId:"mcspaceomega",
+  storageBucket:"mcspaceomega.firebasestorage.app",
+  messagingSenderId:"984192110931",
+  appId:"1:984192110931:web:d7392a9815ab248c6391a6"
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const app=initializeApp(firebaseConfig);
+const db=getFirestore(app);
 
-const verifiedUsers = ["RedWorld"];
-const recommendedServers = ["M5R9X1NY"];
+const verifiedUsers=["RedWorld"];
+const recommendedServers=["M5R9X1NY"];
 
-/* FULL SERVERS */
-let servers = [
-{
-id:1,name:"Erratic SMP",
-desc:"A high-quality MultiCraft survival server with no protected areas. Explore freely, build anything, and enjoy custom features designed to improve survival gameplay. Active players and constant updates.",
-code:"M5R9X1NY",author:"RedWorld",
-bg:"bgs/bg1.png",heart:"hearts/hpvp.png"
-},
-{
-id:2,name:"Ronaldo Vs Messi",
-desc:"Competitive server with parkour, PvP, BedWars, bridging, treasure hunts and more. Designed for skilled players who want challenges, fast gameplay, and intense battles.",
-code:"KAAYBNDP",author:"Elder",
-bg:"bgs/bg2.png",heart:"hearts/hpvp.png"
-},
-{
-id:3,name:"FlatWorld",
-desc:"A creative flat world where you can freely build anything you imagine. No limits, no pressure — just pure building and creativity.",
-code:"MCSRVR03",author:"Unknown",
-bg:"bgs/bg3.png",heart:"hearts/hc.png"
-},
-{
-id:4,name:"New Types PvP",
-desc:"Unique PvP experience with custom mechanics, multiple combat styles, and fun gamemodes that keep fights fresh and exciting.",
-code:"JLIVC3V9",author:"Unknown",
-bg:"bgs/bg4.png",heart:"hearts/hpvp.png"
-},
-{
-id:5,name:"SMP12",
-desc:"An open survival world where players can explore, fight, build, and create their own story. PvP enabled and full freedom.",
-code:"94D92LVD",author:"Jared12",
-bg:"bgs/bg5.png",heart:"hearts/hpvp.png"
-},
-{
-id:6,name:"Stone Simulator",
-desc:"Live underground, mine resources, trade items, and build your wealth using stone-based currencies in a unique economy system.",
-code:"XX9IXQ6H",author:"Jared12",
-bg:"bgs/bg6.png",heart:"hearts/hpvp.png"
-},
-{
-id:7,name:"Parkour Cubicles",
-desc:"Challenge yourself with 36 increasingly difficult parkour cubicles. Only skilled players can complete all levels.",
-code:"QVZACNG5",author:"Jared12",
-bg:"bgs/bg7.png",heart:"hearts/hpvp.png"
-}
+let servers=[
+{id:1,name:"Erratic SMP",desc:"Good MultiCraft SMP with no areas, and more very cool features.",code:"M5R9X1NY",author:"RedWorld",bg:"bgs/bg1.png",heart:"hearts/hpvp.png"},
+{id:2,name:"Ronaldo Vs Messi",desc:"BEST SERVER 👌, PARKOUR / PvP / MINI GAMES / BEDWARS / MANHUNT / TREASURE HUNT / BRIDGING / AXE PVP / AND MANY MORE .. ✨",code:"KAAYBNDP",author:"Elder",bg:"bgs/bg2.png",heart:"hearts/hpvp.png"},
+{id:3,name:"FlatWorld",desc:"Creative Server",code:"MCSRVR03",author:"Unknown",bg:"bgs/bg3.png",heart:"hearts/hc.png"},
+{id:4,name:"New Types PvP",desc:"Awesome PvP server, with a lot fun features and gamemodes.",code:"JLIVC3V9",author:"Unknown",bg:"bgs/bg4.png",heart:"hearts/hpvp.png"},
+{id:5,name:"SMP12",desc:"In here, it's your job to have fun! The world open, PVP; it's a place where you can do anything!",code:"94D92LVD",author:"Jared12",bg:"bgs/bg5.png",heart:"hearts/hpvp.png"},
+{id:6,name:"Stone Simulator",desc:"In here, we live underground! Also, we buy items from The Shop! With currencies such as Stone, Cobblestone, and more!",code:"XX9IXQ6H",author:"Jared12",bg:"bgs/bg6.png",heart:"hearts/hpvp.png"},
+{id:7,name:"Parkour Cubicles",desc:"In here, YOU will try to beat the impossible 36 cubicles of the server to escape!",code:"QVZACNG5",author:"Jared12",bg:"bgs/bg7.png",heart:"hearts/hpvp.png"}
 ];
 
 async function loadVisits(s){
-  const snap = await getDoc(doc(db,"servers",s.code));
+  const snap=await getDoc(doc(db,"servers",s.code));
   if(snap.exists()){
-    const d = snap.data();
-    s.visits = d.visits || 0;
-    s.lastVisits = d.lastVisits || 0;
+    const d=snap.data();
+    s.visits=d.visits||0;
+    s.lastVisits=d.lastVisits||0;
   } else {
-    s.visits = 0;
-    s.lastVisits = 0;
+    s.visits=0;
+    s.lastVisits=0;
   }
-  s.growth = s.visits - s.lastVisits;
+  s.growth=s.visits-s.lastVisits;
 }
 
 async function init(){
   await Promise.all(servers.map(loadVisits));
 
-  const maxGrowth = Math.max(...servers.map(s=>s.growth));
+  const maxGrowth=Math.max(...servers.map(s=>s.growth));
 
-  servers.sort((a,b)=>b.visits-a.visits);
+  servers.forEach(s=>{
+    s.trending=!recommendedServers.includes(s.code) && s.growth>=Math.max(5,maxGrowth*0.7);
+  });
 
   const grid=document.getElementById("grid");
   grid.innerHTML="";
 
   servers.forEach(s=>{
-    const recommended = recommendedServers.includes(s.code);
-    const trending = !recommended && s.growth >= Math.max(2, maxGrowth * 0.5);
-    const verified = verifiedUsers.includes(s.author);
+    const verified=verifiedUsers.includes(s.author);
 
     const card=document.createElement("div");
     card.className="card"+
-      (recommended?" recommended":"")+
-      (trending?" trending":"");
+      (s.trending?" trending":"")+
+      (recommendedServers.includes(s.code)?" recommended":"");
 
     card.innerHTML=`
-      ${recommended?'<div class="badge recommended">RECOMMENDED</div>':''}
-      ${trending?'<div class="badge trending">TRENDING</div>':''}
+      ${recommendedServers.includes(s.code)?'<div class="badge recommended">RECOMMENDED</div>':''}
+      ${s.trending?'<div class="badge trending">TRENDING</div>':''}
 
       <img class="bg" src="${s.bg}">
       <div class="content">
@@ -286,23 +256,19 @@ async function init(){
         <div class="desc">${s.desc}</div>
 
         <div class="actions">
-          <div>${s.visits} visits</div>
+          <div class="visits">${s.visits} visits</div>
           <div class="play-btn" onclick="joinServer('${s.code}')">Play</div>
         </div>
       </div>
     `;
-
     grid.appendChild(card);
   });
 }
 
-window.joinServer = async(code)=>{
-  const ref = doc(db,"servers",code);
-  try{
-    await updateDoc(ref,{visits:increment(1)});
-  }catch{
-    await setDoc(ref,{visits:1,lastVisits:0});
-  }
+window.joinServer=async(code)=>{
+  const ref=doc(db,"servers",code);
+  try{await updateDoc(ref,{visits:increment(1)});}
+  catch{await setDoc(ref,{visits:1,lastVisits:0});}
   location.href="server.html?code="+code;
 };
 
