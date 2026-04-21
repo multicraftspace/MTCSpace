@@ -152,11 +152,12 @@ body{
 
 <div id="grid" class="grid"></div>
 
+<!-- ONLY SCRIPT PART CHANGED (keep your HTML/CSS) -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, doc, getDoc, setDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-const firebaseConfig={
+const firebaseConfig = {
   apiKey:"AIzaSyD4An6C8ZEdiJsohwo76QuRxv1hhjNmRlI",
   authDomain:"mcspaceomega.firebaseapp.com",
   projectId:"mcspaceomega",
@@ -165,12 +166,14 @@ const firebaseConfig={
   appId:"1:984192110931:web:d7392a9815ab248c6391a6"
 };
 
-const app=initializeApp(firebaseConfig);
-const db=getFirestore(app);
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-const verifiedUsers=["RedWorld"];
+const verifiedUsers = ["RedWorld"];
+const recommendedServers = ["M5R9X1NY"];
 
-let servers=[
+/* ✅ FULL SERVERS (YOUR DESCRIPTIONS PRESERVED) */
+let servers = [
 {id:1,name:"Erratic SMP",desc:"Good MultiCraft SMP with no areas, survival gameplay, active players, and many cool features to explore with friends.",code:"M5R9X1NY",author:"RedWorld",bg:"bgs/bg1.png",heart:"hearts/hpvp.png"},
 {id:2,name:"Ronaldo Vs Messi",desc:"BEST SERVER 👌 Includes parkour, PvP, minigames, BedWars, Manhunt, treasure hunt, bridging, axe PvP, and many more fun modes.",code:"KAAYBNDP",author:"Elder",bg:"bgs/bg2.png",heart:"hearts/hpvp.png"},
 {id:3,name:"FlatWorld",desc:"Creative server where you can freely build anything in a flat world environment without limits.",code:"MCSRVR03",author:"Unknown",bg:"bgs/bg3.png",heart:"hearts/hc.png"},
@@ -180,38 +183,65 @@ let servers=[
 {id:7,name:"Parkour Cubicles",desc:"Challenge yourself by completing 36 difficult parkour cubicles and try to escape the impossible map.",code:"QVZACNG5",author:"Jared12",bg:"bgs/bg7.png",heart:"hearts/hpvp.png"}
 ];
 
-async function loadVisits(s){
-  const snap=await getDoc(doc(db,"servers",s.code));
-  s.visits=snap.exists()?snap.data().visits||0:0;
+/* ✅ FAVORITES FIX */
+function getFavs(){
+  return JSON.parse(localStorage.getItem("favs") || "[]");
 }
-
-function isFav(code){
-  return JSON.parse(localStorage.getItem("favs")||"[]").includes(code);
-}
-
 function toggleFav(code){
-  let favs=JSON.parse(localStorage.getItem("favs")||"[]");
-  favs=favs.includes(code)?favs.filter(f=>f!==code):[...favs,code];
-  localStorage.setItem("favs",JSON.stringify(favs));
+  let favs = getFavs();
+  if(favs.includes(code)){
+    favs = favs.filter(f => f !== code);
+  } else {
+    favs.push(code);
+  }
+  localStorage.setItem("favs", JSON.stringify(favs));
   init();
+}
+
+/* LOAD VISITS + GROWTH */
+async function loadVisits(s){
+  const snap = await getDoc(doc(db,"servers",s.code));
+  if(snap.exists()){
+    const d = snap.data();
+    s.visits = d.visits || 0;
+    s.lastVisits = d.lastVisits || 0;
+  } else {
+    s.visits = 0;
+    s.lastVisits = 0;
+  }
+  s.growth = s.visits - s.lastVisits;
 }
 
 async function init(){
   await Promise.all(servers.map(loadVisits));
+
+  /* SORT BY VISITS */
   servers.sort((a,b)=>b.visits-a.visits);
 
-  const q=document.getElementById("search").value.toLowerCase();
-  const grid=document.getElementById("grid");
-  grid.innerHTML="";
+  /* TRENDING (SMART) */
+  const maxGrowth = Math.max(...servers.map(s=>s.growth));
+  servers.forEach(s=>{
+    s.trending = !recommendedServers.includes(s.code) && s.growth >= Math.max(3, maxGrowth * 0.6);
+  });
+
+  const q = document.getElementById("search").value.toLowerCase();
+  const grid = document.getElementById("grid");
+  grid.innerHTML = "";
 
   servers.filter(s=>s.name.toLowerCase().includes(q)).forEach(s=>{
-    const verified=verifiedUsers.includes(s.author);
+    const verified = verifiedUsers.includes(s.author);
+    const fav = getFavs().includes(s.code);
 
-    const card=document.createElement("div");
-    card.className="card";
+    const card = document.createElement("div");
+    card.className = "card" +
+      (s.trending?" trending":"") +
+      (recommendedServers.includes(s.code)?" recommended":"");
 
-    card.innerHTML=`
-      <div class="fav" onclick="toggleFav('${s.code}')">${isFav(s.code)?"❤️":"🤍"}</div>
+    card.innerHTML = `
+      ${recommendedServers.includes(s.code)?'<div class="badge recommended">RECOMMENDED</div>':''}
+      ${s.trending?'<div class="badge trending">TRENDING</div>':''}
+
+      <div class="fav">${fav?"❤️":"🤍"}</div>
 
       <img class="bg" src="${s.bg}">
       <div class="content">
@@ -229,22 +259,28 @@ async function init(){
 
         <div class="actions">
           <div class="visits">${s.visits} visits</div>
-          <div class="btn" onclick="joinServer('${s.code}')">Play</div>
+          <div class="btn play">Play</div>
         </div>
       </div>
     `;
+
+    /* FIXED EVENT LISTENERS */
+    card.querySelector(".fav").onclick = ()=>toggleFav(s.code);
+    card.querySelector(".play").onclick = ()=>joinServer(s.code);
+
     grid.appendChild(card);
   });
 }
 
-window.joinServer=async function(code){
-  const ref=doc(db,"servers",code);
+/* PLAY */
+window.joinServer = async function(code){
+  const ref = doc(db,"servers",code);
   try{await updateDoc(ref,{visits:increment(1)});}
   catch{await setDoc(ref,{visits:1});}
-  location.href="server.html?code="+code;
+  location.href = "server.html?code=" + code;
 };
 
-document.getElementById("search").oninput=init;
+document.getElementById("search").oninput = init;
 
 init();
 </script>
