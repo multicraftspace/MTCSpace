@@ -11,7 +11,7 @@
   src: url('assets/MultiCraft.ttf');
 }
 
-body{
+body {
   margin:0;
   font-family:'MultiCraft', sans-serif;
   background: radial-gradient(circle at top,#ffffff,#f3e8ff);
@@ -30,29 +30,6 @@ body{
 .logo{display:flex;align-items:center;gap:10px;}
 .logo img{height:40px;}
 
-/* SEARCH */
-.search-bar{
-  margin:15px 25px;
-  display:flex;
-  gap:10px;
-}
-
-.search-bar input{
-  flex:1;
-  padding:10px;
-  border-radius:12px;
-  border:2px solid #a855f7;
-  font-family:'MultiCraft';
-}
-
-.filter-btn{
-  padding:10px;
-  border-radius:12px;
-  border:2px solid #a855f7;
-  background:white;
-  cursor:pointer;
-}
-
 /* BUTTONS */
 .add-btn,.play-btn{
   padding:10px 16px;
@@ -65,8 +42,12 @@ body{
 }
 
 .add-btn:hover,.play-btn:hover{
-  transform:translateY(-2px) scale(1.05);
-  box-shadow:0 8px 20px rgba(168,85,247,0.4);
+  transform:translateY(-3px) scale(1.05);
+  box-shadow:0 10px 25px rgba(168,85,247,0.5);
+}
+
+.add-btn:active,.play-btn:active{
+  transform:scale(0.92);
 }
 
 /* GRID */
@@ -89,16 +70,13 @@ body{
   transition:0.3s;
 }
 
-/* 🔥 GLOW EFFECT */
 .card:hover{
-  transform:translateY(-5px);
-  box-shadow:0 0 25px rgba(168,85,247,0.6);
+  transform:translateY(-6px);
 }
 
 .card.trending{border:2px solid red;}
 .card.recommended{border:2px solid cyan;}
 
-/* BADGES */
 .badge{
   position:absolute;
   top:10px;
@@ -134,20 +112,9 @@ body{
 .name{
   font-weight:bold;
   font-size:14px;
-  word-break:break-word;
 }
 
-.author{
-  font-size:12px;
-  opacity:0.7;
-  margin-top:4px;
-  display:flex;
-  gap:5px;
-  align-items:center;
-}
-
-.check{width:14px;}
-
+/* 3 LINE DESC FIX */
 .desc{
   font-size:13px;
   opacity:0.7;
@@ -170,13 +137,20 @@ body{
   opacity:0.7;
 }
 
-/* FAVORITE ICON */
-.fav{
-  position:absolute;
-  top:10px;
-  right:10px;
-  cursor:pointer;
-  font-size:18px;
+/* MODAL */
+.modal{
+  position:fixed;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  background:rgba(0,0,0,0.4);
+}
+
+.modal-box{
+  background:white;
+  padding:25px;
+  border-radius:20px;
 }
 </style>
 </head>
@@ -188,20 +162,23 @@ body{
     <img src="assets/logo.png">
     <div>MCSpace</div>
   </div>
-  <button class="add-btn" onclick="openModal()">+ Add my server</button>
-</div>
 
-<!-- 🔍 SEARCH -->
-<div class="search-bar">
-  <input id="search" placeholder="Search servers...">
-  <button class="filter-btn" onclick="toggleFavFilter()">⭐</button>
+  <button class="add-btn" onclick="openModal()">+ Add my server</button>
 </div>
 
 <div id="grid" class="grid"></div>
 
+<div id="modal" class="modal">
+  <div class="modal-box">
+    <h3>Add your server</h3>
+    <p>DM @rwo1ld in Discord to add your server.</p>
+    <button class="add-btn" onclick="closeModal()">Close</button>
+  </div>
+</div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey:"AIzaSyD4An6C8ZEdiJsohwo76QuRxv1hhjNmRlI",
@@ -218,106 +195,73 @@ const db=getFirestore(app);
 const verifiedUsers=["RedWorld"];
 const recommendedServers=["M5R9X1NY"];
 
-let showFavOnly=false;
-
-/* FAVORITES */
-function getFavs(){
-  return JSON.parse(localStorage.getItem("favorites")||"[]");
-}
-
-function toggleFavFilter(){
-  showFavOnly=!showFavOnly;
-  render();
-}
-
-/* SERVERS */
-let servers=[ /* KEEP YOUR SAME ARRAY HERE */ ];
+let servers=[
+{id:1,name:"Erratic SMP",desc:"Good MultiCraft SMP with survival gameplay, active players, and fun mechanics.",code:"M5R9X1NY",author:"RedWorld",bg:"bgs/bg1.png",heart:"hearts/hpvp.png"},
+{id:2,name:"Ronaldo Vs Messi",desc:"Parkour, PvP, BedWars, Manhunt and more mini-games.",code:"KAAYBNDP",author:"Elder",bg:"bgs/bg2.png",heart:"hearts/hpvp.png"},
+{id:3,name:"FlatWorld",desc:"Creative world where you can build anything freely.",code:"MCSRVR03",author:"Unknown",bg:"bgs/bg3.png",heart:"hearts/hc.png"},
+{id:4,name:"New Types PvP",desc:"Unique PvP modes and custom combat mechanics.",code:"JLIVC3V9",author:"Unknown",bg:"bgs/bg4.png",heart:"hearts/hpvp.png"},
+{id:5,name:"SMP12",desc:"Open SMP world with PvP and exploration.",code:"94D92LVD",author:"Jared12",bg:"bgs/bg5.png",heart:"hearts/hpvp.png"},
+{id:6,name:"Stone Simulator",desc:"Mine, trade and progress through underground economy.",code:"XX9IXQ6H",author:"Jared12",bg:"bgs/bg6.png",heart:"hearts/hpvp.png"},
+{id:7,name:"Parkour Cubicles",desc:"Complete 36 extreme parkour challenges.",code:"QVZACNG5",author:"Jared12",bg:"bgs/bg7.png",heart:"hearts/hpvp.png"}
+];
 
 async function loadVisits(s){
   const snap=await getDoc(doc(db,"servers",s.code));
-  s.visits=snap.exists()?snap.data().visits||0:0;
-  s.lastVisits=snap.exists()?snap.data().lastVisits||0:0;
-  s.growth=s.visits-s.lastVisits;
+  const d=snap.exists()?snap.data():{};
+  s.visits=d.visits||0;
 }
 
 async function init(){
   await Promise.all(servers.map(loadVisits));
+
+  // ✅ FIXED SORTING (REAL)
   servers.sort((a,b)=>b.visits-a.visits);
-  render();
-}
 
-function render(){
   const grid=document.getElementById("grid");
-  const query=document.getElementById("search").value.toLowerCase();
-  const favs=getFavs();
-
   grid.innerHTML="";
 
-  const maxGrowth=Math.max(...servers.map(s=>s.growth));
-
   servers.forEach(s=>{
-    if(showFavOnly && !favs.includes(s.code)) return;
-
-    if(!s.name.toLowerCase().includes(query) &&
-       !s.author.toLowerCase().includes(query)) return;
-
-    const trending=!recommendedServers.includes(s.code) &&
-      s.growth>=Math.max(10, maxGrowth*0.8); // 🔥 FIXED
-
     const card=document.createElement("div");
-    card.className="card"+
-      (trending?" trending":"")+
-      (recommendedServers.includes(s.code)?" recommended":"");
+    const recommended=recommendedServers.includes(s.code);
+    const trending=s.visits>=10 && !recommended;
+
+    card.className="card"+(trending?" trending":"")+(recommended?" recommended":"");
 
     card.innerHTML=`
-      <div class="fav" onclick="toggleFav('${s.code}',event)">
-        ${favs.includes(s.code)?"⭐":"☆"}
-      </div>
-
-      ${recommendedServers.includes(s.code)?'<div class="badge recommended">RECOMMENDED</div>':''}
+      ${recommended?'<div class="badge recommended">RECOMMENDED</div>':''}
       ${trending?'<div class="badge trending">TRENDING</div>':''}
 
       <img class="bg" src="${s.bg}">
+
       <div class="content">
         <div class="title-row">
           <img src="${s.heart}" width="18">
           <div class="name">${s.name}</div>
         </div>
 
-        <div class="author">
-          by ${s.author}
-          ${verifiedUsers.includes(s.author)?'<img class="check" src="assets/check.png">':''}
-        </div>
-
         <div class="desc">${s.desc}</div>
 
         <div class="actions">
           <div class="visits">${s.visits} visits</div>
-          <div class="play-btn" onclick="joinServer('${s.code}')">Play</div>
+          <button class="play-btn" onclick="play('${s.code}')">Play</button>
         </div>
       </div>
     `;
+
     grid.appendChild(card);
   });
 }
 
-/* FAVORITE TOGGLE */
-window.toggleFav=function(code,e){
-  e.stopPropagation();
-  let favs=getFavs();
+window.play=async function(code){
+  const ref=doc(db,"servers",code);
+  try{await updateDoc(ref,{visits:increment(1)});}
+  catch{await setDoc(ref,{visits:1});}
 
-  if(favs.includes(code)) favs=favs.filter(c=>c!==code);
-  else favs.push(code);
-
-  localStorage.setItem("favorites",JSON.stringify(favs));
-  render();
+  window.location.href="server.html?code="+code;
 };
 
-window.joinServer=(code)=>{
-  location.href="server.html?code="+code;
-};
-
-document.getElementById("search").addEventListener("input",render);
+window.openModal=()=>modal.style.display="flex";
+window.closeModal=()=>modal.style.display="none";
 
 init();
 </script>
