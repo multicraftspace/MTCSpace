@@ -211,7 +211,7 @@ const heartEl = document.getElementById("heart");
 const checkEl = document.getElementById("check");
 
 // get code
-const code = location.pathname.replace("/", "");
+const code = location.hash.replace("#/", "");
 const s = servers[code];
 
 if(!s){
