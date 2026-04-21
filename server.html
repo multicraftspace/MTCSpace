@@ -13,12 +13,12 @@
 
 body{
   margin:0;
-  font-family:'MultiCraft';
+  font-family:'MultiCraft',sans-serif;
   background: radial-gradient(circle at top,#ffffff,#f3e8ff);
 }
 
 /* BUTTON */
-.btn{
+.back{
   margin:20px;
   padding:10px 16px;
   border-radius:12px;
@@ -28,29 +28,110 @@ body{
   cursor:pointer;
   transition:0.25s;
 }
-.btn:hover{transform:scale(1.05);}
+.back:hover{
+  transform:translateY(-2px) scale(1.05);
+  box-shadow:0 8px 20px rgba(168,85,247,0.4);
+}
+.back:active{transform:scale(0.9);}
 
 /* CARD */
 .card{
-  max-width:900px;
+  max-width:1000px;
   margin:auto;
   background:white;
   border-radius:20px;
   overflow:hidden;
   box-shadow:0 15px 40px rgba(168,85,247,0.25);
+  position:relative;
+  animation:fadeIn 0.4s ease;
 }
 
-.bg{width:100%;aspect-ratio:16/9;object-fit:cover;}
-.content{padding:25px;}
+@keyframes fadeIn{
+  from{opacity:0; transform:translateY(15px);}
+  to{opacity:1; transform:translateY(0);}
+}
+
+/* BADGES */
+.badge{
+  position:absolute;
+  left:15px;
+  padding:6px 12px;
+  border-radius:10px;
+  font-size:12px;
+  color:white;
+}
+
+.badge.recommended{
+  top:15px;
+  background:linear-gradient(90deg,#00e5ff,#00ffa6);
+  color:black;
+}
+
+.badge.trending{
+  top:50px;
+  background:red;
+}
+
+/* FAVORITE */
+.fav{
+  position:absolute;
+  top:15px;
+  right:15px;
+  font-size:22px;
+  cursor:pointer;
+  transition:0.2s;
+}
+.fav:hover{transform:scale(1.2);}
+.fav.active{color:red;}
+
+.bg{
+  width:100%;
+  aspect-ratio:16/9;
+  object-fit:cover;
+}
+
+.content{
+  padding:25px;
+}
+
+/* TITLE */
+.title-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.name{
+  font-size:22px;
+}
 
 .author{
-  margin-top:5px;
+  width:100%;
+  opacity:0.7;
+  margin-top:4px;
+}
+
+.check{
+  width:16px;
+  margin-left:5px;
+}
+
+/* DESC */
+.desc{
+  margin-top:10px;
+  opacity:0.85;
+}
+
+/* INVITE */
+.invite-label{
+  margin-top:20px;
   opacity:0.7;
 }
 
 .invite{
   display:flex;
-  margin-top:20px;
+  margin-top:6px;
 }
 
 .invite input{
@@ -59,66 +140,149 @@ body{
   border:2px solid #a855f7;
   border-right:none;
   border-radius:12px 0 0 12px;
+  font-family:'MultiCraft';
 }
 
 .copy-btn{
-  border-radius:0 12px 12px 0;
+  padding:12px 16px;
   border:2px solid #a855f7;
-  background:#a855f7;
+  background:linear-gradient(135deg,#a855f7,#7e22ce);
   color:white;
+  border-radius:0 12px 12px 0;
   cursor:pointer;
+  transition:0.25s;
 }
+.copy-btn:hover{
+  transform:scale(1.05);
+  box-shadow:0 8px 20px rgba(168,85,247,0.4);
+}
+.copy-btn:active{transform:scale(0.9);}
 </style>
 </head>
 
 <body>
 
-<div class="btn" onclick="location.href='index.html'">← Back</div>
+<div class="back" onclick="location.href='index.html'">← Back</div>
 
-<div class="card">
+<div id="card" class="card">
+  <div id="fav" class="fav">♡</div>
+
   <img id="bg" class="bg">
+
   <div class="content">
-
-    <h2 id="name"></h2>
-    <div id="author" class="author"></div>
-
-    <p id="desc"></p>
-
-    <div class="invite">
-      <input id="invite" readonly>
-      <button class="copy-btn" onclick="copyCode()">Copy</button>
+    <div class="title-row">
+      <img id="heart" width="26">
+      <div id="name" class="name"></div>
     </div>
 
+    <div id="author" class="author"></div>
+
+    <div id="desc" class="desc"></div>
+
+    <div class="invite-label">Invite Code</div>
+    <div class="invite">
+      <input id="invite" readonly onclick="this.select()">
+      <button class="copy-btn" onclick="copyCode()">Copy</button>
+    </div>
   </div>
 </div>
 
 <script>
+/* FULL SERVERS */
 const servers={
-"M5R9X1NY":{name:"Erratic SMP",desc:"Good MultiCraft SMP with no areas, survival gameplay, active players, and many cool features to explore with friends.",author:"RedWorld",bg:"bgs/bg1.png",heart:"hearts/hpvp.png"},
-"KAAYBNDP":{name:"Ronaldo Vs Messi",desc:"BEST SERVER 👌 Includes parkour, PvP, minigames, BedWars, Manhunt, treasure hunt, bridging, axe PvP, and many more fun modes.",author:"Elder",bg:"bgs/bg2.png",heart:"hearts/hpvp.png"},
-"MCSRVR03":{name:"FlatWorld",desc:"Creative server where you can freely build anything in a flat world environment without limits.",author:"Unknown",bg:"bgs/bg3.png",heart:"hearts/hc.png"},
-"JLIVC3V9":{name:"New Types PvP",desc:"Awesome PvP server with many fun features, unique combat styles, and different gamemodes to enjoy.",author:"Unknown",bg:"bgs/bg4.png",heart:"hearts/hpvp.png"},
-"94D92LVD":{name:"SMP12",desc:"Open world SMP where you can explore, fight, build, and do anything you want with PvP enabled.",author:"Jared12",bg:"bgs/bg5.png",heart:"hearts/hpvp.png"},
-"XX9IXQ6H":{name:"Stone Simulator",desc:"Underground survival server with economy. Mine stone, trade resources, and progress through a unique system.",author:"Jared12",bg:"bgs/bg6.png",heart:"hearts/hpvp.png"},
-"QVZACNG5":{name:"Parkour Cubicles",desc:"Challenge yourself by completing 36 difficult parkour cubicles and try to escape the impossible map.",author:"Jared12",bg:"bgs/bg7.png",heart:"hearts/hpvp.png"}
+"M5R9X1NY":{name:"Erratic SMP",desc:"Good MultiCraft SMP with no areas, and more very cool features.",author:"RedWorld",bg:"bgs/bg1.png",heart:"hearts/hpvp.png"},
+"KAAYBNDP":{name:"Ronaldo Vs Messi",desc:"BEST SERVER 👌, PARKOUR / PvP / MINI GAMES / BEDWARS / MANHUNT / TREASURE HUNT / BRIDGING / AXE PVP / AND MANY MORE .. ✨",author:"Elder",bg:"bgs/bg2.png",heart:"hearts/hpvp.png"},
+"MCSRVR03":{name:"FlatWorld",desc:"Creative Server",author:"Unknown",bg:"bgs/bg3.png",heart:"hearts/hc.png"},
+"JLIVC3V9":{name:"New Types PvP",desc:"Awesome PvP server, with a lot fun features and gamemodes.",author:"Unknown",bg:"bgs/bg4.png",heart:"hearts/hpvp.png"},
+"94D92LVD":{name:"SMP12",desc:"In here, it's your job to have fun! The world open, PVP; it's a place where you can do anything!",author:"Jared12",bg:"bgs/bg5.png",heart:"hearts/hpvp.png"},
+"XX9IXQ6H":{name:"Stone Simulator",desc:"In here, we live underground! Also, we buy items from The Shop! With currencies such as Stone, Cobblestone, and more!",author:"Jared12",bg:"bgs/bg6.png",heart:"hearts/hpvp.png"},
+"QVZACNG5":{name:"Parkour Cubicles",desc:"In here, YOU will try to beat the impossible 36 cubicles of the server to escape!",author:"Jared12",bg:"bgs/bg7.png",heart:"hearts/hpvp.png"}
 };
+
+const verified=["RedWorld"];
+const recommended=["M5R9X1NY"];
+const trending=["KAAYBNDP","JLIVC3V9"];
 
 const code=new URLSearchParams(location.search).get("code");
 const s=servers[code];
 
-document.getElementById("invite").value=code;
+const nameEl=name;
+const descEl=desc;
+const authorEl=author;
+const inviteEl=invite;
+const bgEl=bg;
+const heartEl=heart;
+const favEl=document.getElementById("fav");
+const card=document.getElementById("card");
 
-if(s){
-  document.getElementById("name").innerText=s.name;
-  document.getElementById("desc").innerText=s.desc;
-  document.getElementById("author").innerText="by "+s.author;
-  document.getElementById("bg").src=s.bg;
+if(!s){
+  nameEl.innerText="Server not found";
+}else{
+  load();
+}
+
+function load(){
+  nameEl.innerText=s.name;
+  descEl.innerText=s.desc;
+
+  authorEl.innerHTML="by "+s.author+
+    (verified.includes(s.author)?' <img src="assets/check.png" class="check">':'');
+
+  inviteEl.value=code;
+  bgEl.src=s.bg;
+  heartEl.src=s.heart;
+
+  if(recommended.includes(code)){
+    addBadge("recommended","★ RECOMMENDED");
+  }
+  if(trending.includes(code)){
+    addBadge("trending","🔥 TRENDING");
+  }
+
+  updateFav();
+
   document.title=s.name+" • MCspace";
 }
 
-window.copyCode=()=>{
-  navigator.clipboard.writeText(code);
+/* BADGE */
+function addBadge(type,text){
+  const b=document.createElement("div");
+  b.className="badge "+type;
+  b.innerText=text;
+  card.appendChild(b);
+}
+
+/* FAVORITES */
+function getFavs(){
+  return JSON.parse(localStorage.getItem("favorites")||"[]");
+}
+function updateFav(){
+  const favs=getFavs();
+  if(favs.includes(code)){
+    favEl.classList.add("active");
+    favEl.innerText="♥";
+  }else{
+    favEl.innerText="♡";
+  }
+}
+favEl.onclick=()=>{
+  let favs=getFavs();
+  if(favs.includes(code)){
+    favs=favs.filter(f=>f!==code);
+  }else{
+    favs.push(code);
+  }
+  localStorage.setItem("favorites",JSON.stringify(favs));
+  updateFav();
 };
+
+/* COPY */
+function copyCode(){
+  navigator.clipboard.writeText(invite.value);
+  const btn=document.querySelector(".copy-btn");
+  btn.innerText="Copied!";
+  setTimeout(()=>btn.innerText="Copy",1200);
+}
 </script>
 
 </body>
