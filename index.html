@@ -296,7 +296,7 @@ window.joinServer = async function(code){
     console.log("Cooldown active, visit not counted");
   }
 
-  location.href = "server.html?code=" + code;
+  location.href = "/" + code;
 };
 
 window.openModal=()=>modal.style.display="flex";
