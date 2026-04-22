@@ -1,3 +1,4 @@
+/* --- Font Import --- */
 @font-face {
     font-family: 'MultiCraft';
     src: url('assets/MultiCraft.ttf') format('truetype');
@@ -5,104 +6,169 @@
     font-style: normal;
 }
 
+/* --- Color Palette & Variables --- */
 :root {
-    --primary-color: #00bcd4; /* Cyan */
-    --secondary-color: #ff9800; /* Orange */
-    --background-color: #1e1e1e; /* Dark background */
-    --text-color: #ffffff; /* White text */
-    --accent-color: #4caf50; /* Green accent */
-    --font-primary: 'MultiCraft', sans-serif; /* Using your custom font as primary */
-    /* Removed --font-secondary as Orbitron is no longer used */
+    --primary-purple: #673ab7; /* Deep Purple */
+    --secondary-purple-light: #9575cd; /* Light Purple */
+    --accent-white: #ffffff;
+    --background-dark: #1a0f2e; /* Very Dark, almost black, with a hint of purple */
+    --text-muted: rgba(255, 255, 255, 0.7);
+    --font-primary: 'MultiCraft', sans-serif;
+    --border-color: rgba(103, 58, 183, 0.3); /* Purple border */
+    --shadow-color: rgba(0, 0, 0, 0.5);
 }
 
+/* --- Global Styles --- */
 body {
     margin: 0;
     padding: 0;
     font-family: var(--font-primary);
-    background-color: var(--background-color);
-    color: var(--text-color);
+    background-color: var(--background-dark);
+    color: var(--accent-white);
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
     text-align: center;
     overflow: hidden;
+    background-image: linear-gradient(135deg, var(--background-dark) 0%, var(--primary-purple) 100%);
 }
 
 .maintenance-container {
-    background: rgba(255, 255, 255, 0.05);
-    padding: 50px 60px;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    max-width: 800px;
+    background: rgba(255, 255, 255, 0.03); /* Subtle white overlay */
+    padding: 60px 70px;
+    border-radius: 20px; /* More rounded corners */
+    box-shadow: 0 15px 50px var(--shadow-color), /* Larger, softer shadow */
+                inset 0 0 20px rgba(103, 58, 183, 0.2); /* Inner purple glow */
+    backdrop-filter: blur(15px); /* Increased blur */
+    border: 1px solid var(--border-color);
+    max-width: 850px;
     width: 90%;
-    animation: fadeIn 1s ease-in-out;
+    animation: fadeIn 1.5s ease-in-out;
+    position: relative; /* For potential pseudo-elements */
+    overflow: hidden; /* Ensure any pseudo-elements don't spill */
+}
+
+/* Subtle background animation */
+.maintenance-container::before {
+    content: '';
+    position: absolute;
+    top: -50px;
+    left: -50px;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(103, 58, 183, 0.4) 0%, rgba(103, 58, 183, 0) 70%);
+    z-index: -1;
+    animation: float 10s ease-in-out infinite;
+}
+
+.maintenance-container::after {
+    content: '';
+    position: absolute;
+    bottom: -50px;
+    right: -50px;
+    width: 150px;
+    height: 150px;
+    background: radial-gradient(circle, rgba(149, 117, 205, 0.3) 0%, rgba(149, 117, 205, 0) 70%);
+    z-index: -1;
+    animation: float 12s ease-in-out infinite reverse;
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes float {
+    0% { transform: translate(0, 0); }
+    50% { transform: translate(-20px, 20px); }
+    100% { transform: translate(0, 0); }
 }
 
 .logo {
-    max-width: 150px;
-    margin-bottom: 20px;
-    animation: pulse 2s infinite alternate;
+    max-width: 180px; /* Slightly larger logo */
+    margin-bottom: 25px;
+    filter: drop-shadow(0 0 15px rgba(103, 58, 183, 0.6)); /* Purple glow */
+    animation: pulse 2.5s infinite alternate;
 }
 
 @keyframes pulse {
-    from { transform: scale(1); }
-    to { transform: scale(1.05); }
+    from { transform: scale(1); box-shadow: 0 0 10px rgba(103, 58, 183, 0.5); }
+    to { transform: scale(1.05); box-shadow: 0 0 20px rgba(103, 58, 183, 0.8); }
 }
 
 .site-title {
-    font-family: var(--font-primary); /* Using custom font for title */
-    font-size: 3.5em;
+    font-size: 4em; /* Larger title */
     margin-bottom: 15px;
-    color: var(--primary-color);
-    text-shadow: 0 0 10px var(--primary-color), 0 0 20px var(--primary-color);
+    color: var(--accent-white); /* White for strong contrast */
+    letter-spacing: 2px;
+    text-shadow: 0 0 15px rgba(103, 58, 183, 0.7), /* Purple glow */
+                 0 0 25px rgba(103, 58, 183, 0.5);
 }
 
 .maintenance-message {
-    font-size: 1.8em;
-    margin-bottom: 10px;
-    color: var(--text-color);
+    font-size: 2.2em; /* Larger message */
+    margin-bottom: 15px;
+    color: var(--secondary-purple-light); /* Lighter purple for the main message */
     line-height: 1.5;
+    font-weight: normal; /* Ensure it doesn't override custom font if it has weight */
 }
 
 .sub-message {
-    font-size: 1.2em;
-    color: rgba(255, 255, 255, 0.8);
-    margin-bottom: 40px; /* Adjusted margin as countdown is removed */
-    line-height: 1.6;
+    font-size: 1.3em; /* Slightly larger sub-message */
+    color: var(--text-muted);
+    margin-bottom: 50px; /* More space before contact info */
+    line-height: 1.7;
 }
 
-/* Countdown container removed */
-
-/* Social links section removed */
-
-.contact-message {
-    font-size: 1em;
-    color: rgba(255, 255, 255, 0.7);
-    margin-top: 40px; /* Added margin to push it down */
+.contact-info {
+    margin-top: 50px; /* Push contact info down */
+    font-size: 1.1em;
+    color: var(--text-muted);
 }
 
-.contact-message a {
-    color: var(--secondary-color);
-    text-decoration: underline;
-    transition: color 0.3s ease;
+.contact-info a {
+    color: var(--secondary-purple-light);
+    text-decoration: none; /* Remove underline */
+    font-weight: bold;
+    transition: color 0.3s ease, text-shadow 0.3s ease;
 }
 
-.contact-message a:hover {
-    color: var(--accent-color);
+.contact-info a:hover {
+    color: var(--accent-white);
+    text-shadow: 0 0 8px var(--accent-white); /* Subtle glow on hover */
 }
 
-/* Responsive adjustments */
+/* --- Responsive Adjustments --- */
 @media (max-width: 768px) {
     .maintenance-container {
-        padding: 30px 40px;
+        padding: 40px 50px;
+    }
+
+    .site-title {
+        font-size: 3.5em;
+    }
+
+    .maintenance-message {
+        font-size: 1.8em;
+    }
+
+    .sub-message {
+        font-size: 1.15em;
+    }
+
+    .contact-info {
+        font-size: 1em;
+    }
+
+    .logo {
+        max-width: 150px;
+    }
+}
+
+@media (max-width: 480px) {
+    .maintenance-container {
+        padding: 30px 35px;
     }
 
     .site-title {
@@ -115,27 +181,15 @@ body {
 
     .sub-message {
         font-size: 1.1em;
+        margin-bottom: 40px;
     }
 
-    /* Removed countdown-specific styles */
-}
-
-@media (max-width: 480px) {
-    .maintenance-container {
-        padding: 20px 25px;
+    .contact-info {
+        font-size: 0.95em;
+        margin-top: 40px;
     }
 
-    .site-title {
-        font-size: 2.5em;
+    .logo {
+        max-width: 120px;
     }
-
-    .maintenance-message {
-        font-size: 1.4em;
-    }
-
-    .sub-message {
-        font-size: 1em;
-    }
-
-    /* Removed countdown-specific styles */
 }
