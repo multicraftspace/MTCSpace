@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Profile • MTCSpace</title>
+<title>Profile</title>
 
 <style>
 @font-face{
@@ -20,113 +20,99 @@ body{
 
 /* HEADER */
 .header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:15px 25px;
-  border-bottom:2px solid #a855f7;
+  padding:20px;
 }
 
-.btn{
-  padding:10px 16px;
-  border-radius:12px;
-  border:2px solid #a855f7;
-  background:linear-gradient(135deg,#a855f7,#7e22ce);
-  color:white;
-  cursor:pointer;
-  transition:0.25s;
-}
-.btn:hover{
-  transform:translateY(-2px);
-}
-
-/* PROFILE */
+/* PROFILE CARD */
 .profile{
   max-width:900px;
-  margin:30px auto;
+  margin:auto;
   background:white;
   border-radius:20px;
-  padding:25px;
-  box-shadow:0 15px 40px rgba(168,85,247,0.25);
-  text-align:center;
-  animation:fadeIn .4s;
+  padding:20px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.1);
 }
 
-@keyframes fadeIn{
-  from{opacity:0; transform:translateY(10px);}
-  to{opacity:1; transform:translateY(0);}
+.top{
+  display:flex;
+  gap:15px;
+  align-items:center;
 }
 
 .pfp{
-  width:100px;
-  height:100px;
+  width:80px;
+  height:80px;
   border-radius:50%;
   object-fit:cover;
-  border:3px solid #a855f7;
 }
 
 .name{
-  font-size:22px;
-  margin-top:10px;
+  font-size:20px;
+  font-weight:bold;
 }
 
 .check{
   width:18px;
-  vertical-align:middle;
+  margin-left:5px;
 }
 
 .desc{
   margin-top:10px;
-  opacity:0.7;
+  opacity:0.8;
 }
 
-textarea{
-  width:100%;
-  border-radius:12px;
+/* BUTTON */
+.btn{
+  padding:10px 14px;
+  border-radius:10px;
   border:2px solid #a855f7;
-  padding:10px;
+  background:#a855f7;
+  color:white;
+  cursor:pointer;
   font-family:'MultiCraft';
   margin-top:10px;
 }
 
-.subs{
-  margin-top:10px;
-  font-size:14px;
-  opacity:0.7;
+/* SERVERS */
+.servers{
+  max-width:900px;
+  margin:20px auto;
 }
 
-/* SERVERS */
 .grid{
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-  gap:20px;
-  padding:30px;
+  gap:15px;
 }
 
+/* CARD */
 .card{
-  border-radius:20px;
   background:white;
+  border-radius:15px;
   overflow:hidden;
-  box-shadow:0 10px 25px rgba(168,85,247,0.2);
+  box-shadow:0 8px 20px rgba(0,0,0,0.1);
   cursor:pointer;
-  transition:0.25s;
-}
-.card:hover{
-  transform:translateY(-5px);
 }
 
 .bg{
   width:100%;
-  aspect-ratio:16/9;
+  height:120px;
   object-fit:cover;
 }
 
-.content{
+.card-content{
   padding:10px;
 }
 
-.nameS{
+.card-name{
+  font-size:14px;
   font-weight:bold;
+}
+
+.card-desc{
+  font-size:12px;
+  opacity:0.7;
+  margin-top:5px;
 }
 </style>
 </head>
@@ -134,86 +120,74 @@ textarea{
 <body>
 
 <div class="header">
-  <div onclick="location.href='index.html'" class="btn">← Back</div>
+  <button class="btn" onclick="location.href='index.html'">← Back</button>
 </div>
 
 <div class="profile">
-  <img id="pfp" class="pfp">
-  <div class="name" id="name"></div>
-  <div class="subs" id="subs"></div>
+  <div class="top">
+    <img id="pfp" class="pfp">
+    <div>
+      <div id="name" class="name"></div>
+      <div id="subs"></div>
+    </div>
+  </div>
 
   <div id="desc" class="desc"></div>
 
-  <textarea id="editDesc" placeholder="Edit your description..." style="display:none;"></textarea>
+  <textarea id="editDesc" style="width:100%;display:none;margin-top:10px;"></textarea>
   <button id="saveBtn" class="btn" style="display:none;">Save</button>
 
-  <br><br>
-  <button id="subBtn" class="btn">Subscribe</button>
+  <button id="subBtn" class="btn"></button>
 </div>
 
-<div id="servers" class="grid"></div>
+<div class="servers">
+  <h3 style="text-align:center;">Servers</h3>
+  <div id="grid" class="grid"></div>
+</div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
   getFirestore, doc, getDoc, updateDoc,
-  increment, collection, getDocs
+  collection, getDocs
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-/* FIREBASE CONFIG */
 const app = initializeApp({
-  apiKey: "AIzaSyD4An6C8ZEdiJsohwo76QuRxv1hhjNmRlI",
-  authDomain: "mcspaceomega.firebaseapp.com",
-  projectId: "mcspaceomega",
-  storageBucket: "mcspaceomega.firebasestorage.app",
-  messagingSenderId: "984192110931",
-  appId: "1:984192110931:web:d7392a9815ab248c6391a6"
+  apiKey:"AIzaSyD4An6C8ZEdiJsohwo76QuRxv1hhjNmRlI",
+  authDomain:"mcspaceomega.firebaseapp.com",
+  projectId:"mcspaceomega"
 });
 
 const db = getFirestore(app);
 
-/* GET USER FROM URL */
-const username = new URLSearchParams(location.search).get("u")?.replace("@","");
-
+const username = new URLSearchParams(location.search).get("u");
 const currentUser = localStorage.getItem("user");
-
-/* ELEMENTS */
-const nameEl = document.getElementById("name");
-const descEl = document.getElementById("desc");
-const editDesc = document.getElementById("editDesc");
-const saveBtn = document.getElementById("saveBtn");
-const pfpEl = document.getElementById("pfp");
-const subsEl = document.getElementById("subs");
-const subBtn = document.getElementById("subBtn");
 
 /* LOAD PROFILE */
 async function load(){
-  const ref = doc(db,"users",username);
-  const snap = await getDoc(ref);
+  const snap = await getDoc(doc(db,"users",username));
+  if(!snap.exists()) return;
 
-  if(!snap.exists()){
-    nameEl.innerText="User not found";
-    return;
-  }
+  const u = snap.data();
 
-  const d = snap.data();
+  name.innerHTML = username + (u.verified?'<img class="check" src="assets/check.png">':'');
+  subs.innerText = (u.subs||0) + " subscribers";
+  desc.innerText = u.description || "No description";
 
-  nameEl.innerHTML = username +
-    (d.verified ? ' <img src="assets/check.png" class="check">' : '');
+  pfp.src = (u.pfpURL && u.pfpURL!=="no") ? u.pfpURL : "assets/default.png";
 
-  descEl.innerText = d.description || "No description.";
-  subsEl.innerText = (d.subs || 0) + " subscribers";
-
-  pfpEl.src = d.pfpURL && d.pfpURL !== "no"
-    ? d.pfpURL
-    : "assets/default.png";
-
-  /* OWNER EDIT */
+  /* OWNER */
   if(currentUser === username){
     editDesc.style.display="block";
     saveBtn.style.display="inline-block";
-    editDesc.value = d.description || "";
+    subBtn.style.display="none";
+
+    editDesc.value = u.description || "";
+  } else {
+    subBtn.innerText="Subscribe";
   }
+
+  loadServers();
 }
 
 /* SAVE DESC */
@@ -221,24 +195,25 @@ saveBtn.onclick = async ()=>{
   await updateDoc(doc(db,"users",username),{
     description: editDesc.value
   });
-  location.reload();
+  desc.innerText = editDesc.value;
 };
 
 /* SUBSCRIBE */
 subBtn.onclick = async ()=>{
-  if(!currentUser) return alert("Login required");
+  if(!currentUser) return alert("Sign up first");
 
   await updateDoc(doc(db,"users",username),{
-    subs: increment(1)
+    subs: (await getDoc(doc(db,"users",username))).data().subs + 1
   });
 
-  location.reload();
+  subBtn.innerText="Subscribed";
 };
 
 /* LOAD USER SERVERS */
 async function loadServers(){
   const snap = await getDocs(collection(db,"servers"));
-  const container = document.getElementById("servers");
+
+  grid.innerHTML="";
 
   snap.forEach(d=>{
     const s = d.data();
@@ -246,20 +221,24 @@ async function loadServers(){
 
     const card = document.createElement("div");
     card.className="card";
-    card.onclick=()=>location.href="server.html?code="+d.id;
 
     card.innerHTML=`
-      <img class="bg" src="${s.bg || 'bgs/bg1.png'}">
-      <div class="content">
-        <div class="nameS">${s.name}</div>
+      <img class="bg" src="${s.bg||'bgs/bg1.png'}">
+      <div class="card-content">
+        <div class="card-name">${s.name}</div>
+        <div class="card-desc">${s.desc}</div>
       </div>
     `;
-    container.appendChild(card);
+
+    card.onclick = ()=>{
+      location.href="server.html?code="+d.id;
+    };
+
+    grid.appendChild(card);
   });
 }
 
 load();
-loadServers();
 </script>
 
 </body>
