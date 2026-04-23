@@ -32,25 +32,31 @@ body{
   align-items:center;
   gap:10px;
 }
-
 .logo img{height:40px;}
 
 .search{
-  padding:10px;
+  padding:10px 14px;
   border-radius:12px;
   border:2px solid #a855f7;
-  width:260px;
+  outline:none;
   font-family:'MultiCraft';
+  width:260px;
 }
 
 /* BUTTON */
 .btn{
+  font-family:'MultiCraft';
   padding:10px 16px;
   border-radius:12px;
   border:2px solid #a855f7;
   background:linear-gradient(135deg,#a855f7,#7e22ce);
   color:white;
   cursor:pointer;
+  transition:0.25s;
+}
+.btn:hover{
+  transform:translateY(-2px) scale(1.05);
+  box-shadow:0 8px 20px rgba(168,85,247,0.4);
 }
 
 /* GRID */
@@ -63,83 +69,125 @@ body{
 
 /* CARD */
 .card{
-  background:white;
+  position:relative;
   border-radius:20px;
   overflow:hidden;
-  box-shadow:0 10px 30px rgba(0,0,0,0.1);
-  transition:0.2s;
+  background:white;
+  box-shadow:0 15px 35px rgba(168,85,247,0.25);
+  display:flex;
+  flex-direction:column;
+  border:2px solid transparent;
+  transition:0.25s;
 }
-.card:hover{transform:translateY(-5px);}
+.card:hover{
+  transform:translateY(-6px);
+}
 
+/* BADGES */
+.card.trending{border:2px solid red;}
+.card.recommended{border:2px solid cyan;}
+
+.badge{
+  position:absolute;
+  top:10px;
+  left:10px;
+  padding:5px 10px;
+  border-radius:10px;
+  font-size:11px;
+  z-index:5;
+}
+
+.badge.trending{background:red;color:white;}
+.badge.recommended{
+  background:linear-gradient(90deg,#00e5ff,#00ffa6);
+  color:black;
+}
+
+/* IMAGE */
 .bg{
   width:100%;
   aspect-ratio:16/9;
   object-fit:cover;
 }
 
-.content{padding:12px;}
+/* CONTENT */
+.content{
+  padding:12px;
+  display:flex;
+  flex-direction:column;
+  flex:1;
+}
 
+.name{
+  font-weight:bold;
+  font-size:15px;
+}
+
+/* AUTHOR */
 .author{
-  font-size:12px;
-  opacity:0.7;
   display:flex;
   align-items:center;
-  gap:5px;
+  gap:6px;
+  font-size:12px;
+  opacity:0.7;
+  margin-top:3px;
 }
 
-.author img{
-  width:16px;
-  height:16px;
+.pfp{
+  width:18px;
+  height:18px;
   border-radius:50%;
+  object-fit:cover;
 }
 
+.check{
+  width:14px;
+}
+
+/* DESC */
 .desc{
   font-size:13px;
   opacity:0.7;
   margin-top:6px;
+
+  display:-webkit-box;
+  -webkit-line-clamp:3;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
 }
 
+/* ACTIONS */
 .actions{
+  margin-top:auto;
   display:flex;
   justify-content:space-between;
   align-items:center;
-  margin-top:10px;
 }
 
-/* MODAL */
-.modal{
-  position:fixed;
-  inset:0;
-  display:none;
-  justify-content:center;
+.visits{
+  font-size:12px;
+  opacity:0.7;
+}
+
+/* RIGHT SIDE BUTTONS */
+.right{
+  display:flex;
   align-items:center;
-  background:rgba(0,0,0,0.5);
+  gap:10px;
 }
 
-.modal-box{
-  background:white;
-  padding:25px;
-  border-radius:20px;
-  width:350px;
-  position:relative;
-}
-
-/* CLOSE BUTTON */
-.close{
-  position:absolute;
-  top:10px;
-  right:15px;
+/* FAVORITE */
+.fav{
   cursor:pointer;
-  font-size:18px;
+  font-size:16px;
+  margin-right:8px;
 }
 
-input{
-  width:100%;
-  padding:10px;
-  margin-bottom:10px;
-  border-radius:10px;
-  border:2px solid #a855f7;
-  font-family:'MultiCraft';
+/* AUTH BUTTON */
+.user-btn{
+  display:flex;
+  align-items:center;
+  gap:6px;
 }
 </style>
 </head>
@@ -152,9 +200,9 @@ input{
     <div>MTCSpace</div>
   </div>
 
-  <input id="search" class="search" placeholder="Search...">
+  <input id="search" class="search" placeholder="Search servers...">
 
-  <div>
+  <div class="right">
     <button class="btn" onclick="openAdd()">+ Add my server</button>
     <button class="btn" onclick="contact()">📩</button>
     <button id="authBtn" class="btn" onclick="openAuth()">Sign Up</button>
@@ -163,132 +211,106 @@ input{
 
 <div id="grid" class="grid"></div>
 
-<!-- AUTH MODAL -->
-<div id="authModal" class="modal">
-  <div class="modal-box">
-    <div class="close" onclick="closeAuth()">✖</div>
-
-    <h3>Account</h3>
-
-    <input id="user" placeholder="Username">
-    <input id="pass" type="password" placeholder="Password">
-    <input id="pfp" placeholder="Profile Picture URL (optional)">
-
-    <button class="btn" onclick="signup()">Sign Up</button>
-    <button class="btn" onclick="login()">Login</button>
-  </div>
-</div>
-
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
-getFirestore, collection, getDocs, doc, getDoc,
-setDoc, updateDoc, increment
+  getFirestore, collection, getDocs,
+  doc, getDoc, updateDoc, increment
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-/* FULL CONFIG */
+/* FIREBASE */
 const app = initializeApp({
   apiKey: "AIzaSyD4An6C8ZEdiJsohwo76QuRxv1hhjNmRlI",
   authDomain: "mcspaceomega.firebaseapp.com",
-  projectId: "mcspaceomega",
-  storageBucket: "mcspaceomega.firebasestorage.app",
-  messagingSenderId: "984192110931",
-  appId: "1:984192110931:web:d7392a9815ab248c6391a6"
+  projectId: "mcspaceomega"
 });
-
 const db = getFirestore(app);
 
-let allServers = [];
-const currentUser = localStorage.getItem("user");
+const recommended=["M5R9X1NY"];
 
-if(currentUser){
-  authBtn.innerText = currentUser;
+let allServers=[];
+
+/* AUTH DISPLAY */
+async function loadUser(){
+  const u = localStorage.getItem("user");
+  if(!u) return;
+
+  const snap = await getDoc(doc(db,"users",u));
+  if(!snap.exists()) return;
+
+  const d = snap.data();
+
+  authBtn.innerHTML = `
+    <div class="user-btn">
+      <img class="pfp" src="${d.pfpURL && d.pfpURL!=="no"?d.pfpURL:"assets/default.png"}">
+      ${u}
+    </div>
+  `;
 }
-
-/* AUTH */
-window.openAuth = () => authModal.style.display = "flex";
-window.closeAuth = () => authModal.style.display = "none";
-
-window.signup = async () => {
-  try{
-    const u = user.value.trim();
-    const p = pass.value.trim();
-    const pic = pfp.value.trim() || "no";
-
-    if(!u || !p) return alert("Fill fields");
-
-    const ref = doc(db,"users",u);
-    if((await getDoc(ref)).exists()) return alert("Username taken");
-
-    await setDoc(ref,{
-      password:p,
-      pfp:pic,
-      subs:0,
-      desc:""
-    });
-
-    localStorage.setItem("user",u);
-    location.reload();
-  }catch(e){
-    console.error(e);
-    alert("Signup error");
-  }
-};
-
-window.login = async () => {
-  try{
-    const snap = await getDoc(doc(db,"users",user.value));
-    if(!snap.exists()) return alert("User not found");
-
-    if(snap.data().password !== pass.value){
-      return alert("Wrong password");
-    }
-
-    localStorage.setItem("user",user.value);
-    location.reload();
-  }catch(e){
-    console.error(e);
-    alert("Login error");
-  }
-};
 
 /* LOAD SERVERS */
 async function load(){
-  try{
-    const snap = await getDocs(collection(db,"servers"));
+  const snap = await getDocs(collection(db,"servers"));
+  allServers=[];
 
-    allServers = [];
+  snap.forEach(d=>{
+    const s=d.data();
+    s.code=d.id;
+    s.growth=(s.visits||0)-(s.lastVisits||0);
+    allServers.push(s);
+  });
 
-    snap.forEach(d=>{
-      const s = d.data();
-      s.code = d.id;
-      allServers.push(s);
-    });
-
-    render(allServers);
-  }catch(e){
-    console.error("LOAD ERROR:", e);
-  }
+  render(allServers);
 }
 
 /* RENDER */
 async function render(list){
-  grid.innerHTML = "";
+  const grid=document.getElementById("grid");
+  grid.innerHTML="";
+
+  const maxGrowth=Math.max(...list.map(s=>s.growth||0),1);
+
+  list.sort((a,b)=>b.visits-a.visits);
 
   for(const s of list){
-    const card = document.createElement("div");
-    card.className = "card";
 
-    card.innerHTML = `
+    const userSnap = await getDoc(doc(db,"users",s.author));
+    const user = userSnap.exists()?userSnap.data():{};
+
+    const trending=(s.growth||0)>maxGrowth*0.6;
+    const isRec=recommended.includes(s.code);
+
+    const favs=JSON.parse(localStorage.getItem("favs")||"[]");
+
+    const card=document.createElement("div");
+    card.className="card"+(trending?" trending":"")+(isRec?" recommended":"");
+
+    card.innerHTML=`
+      ${isRec?'<div class="badge recommended">★ RECOMMENDED</div>':''}
+      ${trending?'<div class="badge trending">🔥 TRENDING</div>':''}
+
       <img class="bg" src="${s.bg || 'bgs/bg1.png'}">
+
       <div class="content">
-        <b>${s.name || "No name"}</b>
-        <div class="author">by ${s.author || "Unknown"}</div>
-        <div class="desc">${s.desc || ""}</div>
+        <div class="name">${s.name}</div>
+
+        <div class="author">
+          <img class="pfp" src="${user.pfpURL && user.pfpURL!=="no"?user.pfpURL:"assets/default.png"}">
+          ${s.author}
+          ${user.verified?'<img class="check" src="assets/check.png">':''}
+        </div>
+
+        <div class="desc">${s.desc}</div>
 
         <div class="actions">
-          <span>${s.visits || 0} visits</span>
-          <button class="btn" onclick="play('${s.code}')">Play</button>
+          <div class="visits">${s.visits||0} visits</div>
+
+          <div>
+            <span class="fav" onclick="fav('${s.code}')">
+              ${favs.includes(s.code)?"❤️":"🤍"}
+            </span>
+            <button class="btn" onclick="play('${s.code}')">Play</button>
+          </div>
         </div>
       </div>
     `;
@@ -297,49 +319,56 @@ async function render(list){
   }
 }
 
+/* FAVORITES */
+window.fav=(code)=>{
+  let favs=JSON.parse(localStorage.getItem("favs")||"[]");
+  favs.includes(code)?favs=favs.filter(x=>x!==code):favs.push(code);
+  localStorage.setItem("favs",JSON.stringify(favs));
+  render(allServers);
+};
+
 /* SEARCH */
-search.oninput = () => {
-  const q = search.value.toLowerCase();
-  render(allServers.filter(s =>
-    (s.name || "").toLowerCase().includes(q)
-  ));
+search.oninput=()=>{
+  const q=search.value.toLowerCase();
+  render(allServers.filter(s=>s.name.toLowerCase().includes(q)));
 };
 
 /* PLAY */
-const COOLDOWN = 600000;
+const COOLDOWN=10*60*1000;
 
-window.play = async (code) => {
-  try{
-    const key = "visit_" + code;
-    const now = Date.now();
+window.play=async(code)=>{
+  const key="visit_"+code;
+  const now=Date.now();
 
-    if(!localStorage.getItem(key) || now - localStorage.getItem(key) > COOLDOWN){
-      await updateDoc(doc(db,"servers",code),{
-        visits: increment(1)
-      });
-      localStorage.setItem(key, now);
-    }
-
-    location.href = "server.html?code=" + code;
-  }catch(e){
-    console.error(e);
+  if(!localStorage.getItem(key)||now-localStorage.getItem(key)>COOLDOWN){
+    await updateDoc(doc(db,"servers",code),{
+      visits:increment(1)
+    });
+    localStorage.setItem(key,now);
   }
+
+  location.href="server.html?code="+code;
 };
 
 /* BUTTONS */
-window.openAdd = () => {
+window.openAdd=()=>{
   if(!localStorage.getItem("user")){
-    openAuth();
+    alert("Sign up first!");
   }else{
-    location.href = "mailto:add@mtcspace.com";
+    location.href="mailto:add@mtcspace.com";
   }
 };
 
-window.contact = () => {
-  location.href = "mailto:contact@mtcspace.com?subject=I need help";
+window.contact=()=>{
+  location.href="mailto:contact@mtcspace.com";
+};
+
+window.openAuth=()=>{
+  alert("Auth UI will be upgraded next step");
 };
 
 load();
+loadUser();
 </script>
 
 </body>
