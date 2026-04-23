@@ -18,7 +18,6 @@ body{
   color:#2d0b4e;
 }
 
-/* HEADER */
 .header{
   display:flex;
   justify-content:space-between;
@@ -28,24 +27,17 @@ body{
   gap:10px;
 }
 
-.logo{display:flex;align-items:center;gap:10px;}
+.logo{display:flex;gap:10px;align-items:center;}
 .logo img{height:40px;}
 
-/* SEARCH */
 .search{
-  padding:10px 14px;
+  padding:10px;
   border-radius:12px;
   border:2px solid #a855f7;
-  outline:none;
-  font-family:'MultiCraft';
   width:260px;
-  transition:0.25s;
-}
-.search:focus{
-  box-shadow:0 0 10px rgba(168,85,247,0.4);
+  font-family:'MultiCraft';
 }
 
-/* BUTTONS */
 .btn{
   padding:10px 16px;
   border-radius:12px;
@@ -53,16 +45,8 @@ body{
   background:linear-gradient(135deg,#a855f7,#7e22ce);
   color:white;
   cursor:pointer;
-  transition:0.25s;
-  font-family:'MultiCraft';
 }
-.btn:hover{
-  transform:translateY(-2px) scale(1.05);
-  box-shadow:0 8px 20px rgba(168,85,247,0.4);
-}
-.btn:active{transform:scale(0.9);}
 
-/* GRID */
 .grid{
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
@@ -70,24 +54,15 @@ body{
   padding:30px;
 }
 
-/* CARD */
 .card{
   position:relative;
   border-radius:20px;
-  background:white;
   overflow:hidden;
-  display:flex;
-  flex-direction:column;
+  background:white;
   box-shadow:0 15px 35px rgba(168,85,247,0.25);
   border:2px solid transparent;
-  transition:0.25s;
 }
 
-.card:hover{
-  transform:translateY(-5px);
-}
-
-/* BADGES */
 .card.trending{border:2px solid red;}
 .card.recommended{border:2px solid cyan;}
 
@@ -95,94 +70,25 @@ body{
   position:absolute;
   top:10px;
   left:10px;
-  padding:6px 10px;
+  padding:5px 10px;
   border-radius:10px;
   font-size:11px;
-  font-weight:bold;
   z-index:5;
 }
-
 .badge.trending{background:red;color:white;}
-.badge.recommended{
-  background:linear-gradient(90deg,#00e5ff,#00ffa6);
-  color:black;
-}
+.badge.recommended{background:cyan;color:black;}
 
-/* IMAGE */
-.bg{
-  width:100%;
-  aspect-ratio:16/9;
-  object-fit:cover;
-}
+.bg{width:100%;aspect-ratio:16/9;object-fit:cover;}
 
-/* CONTENT */
-.content{
-  padding:12px;
-  display:flex;
-  flex-direction:column;
-  flex:1;
-}
-
-.name{font-weight:bold;font-size:14px;}
-
-.author{
-  font-size:12px;
-  opacity:0.7;
-}
-
-.check{width:14px;margin-left:4px;}
-
-.desc{
-  font-size:13px;
-  opacity:0.7;
-  margin-top:6px;
-  display:-webkit-box;
-  -webkit-line-clamp:3;
-  -webkit-box-orient:vertical;
-  overflow:hidden;
-}
+.content{padding:12px;}
 
 .actions{
-  margin-top:auto;
   display:flex;
   justify-content:space-between;
   align-items:center;
 }
 
-.visits{
-  font-size:12px;
-  opacity:0.7;
-}
-
-.fav{
-  cursor:pointer;
-  font-size:16px;
-  margin-right:10px;
-}
-
-/* MODAL */
-.modal{
-  position:fixed;
-  top:0;left:0;
-  width:100%;height:100%;
-  display:none;
-  align-items:center;
-  justify-content:center;
-  background:rgba(0,0,0,0.4);
-}
-
-.modal-box{
-  background:white;
-  padding:25px;
-  border-radius:20px;
-  text-align:center;
-  width:300px;
-}
-
-.close{
-  float:right;
-  cursor:pointer;
-}
+.fav{cursor:pointer;}
 </style>
 </head>
 
@@ -206,59 +112,64 @@ body{
 <div id="grid" class="grid"></div>
 
 <!-- AUTH -->
-<div id="authModal" class="modal">
-  <div class="modal-box">
-    <span class="close" onclick="authModal.style.display='none'">✖</span>
+<div id="authModal" style="display:none;position:fixed;top:0;width:100%;height:100%;background:#0005;">
+  <div style="background:white;padding:20px;margin:100px auto;width:300px;border-radius:20px;">
     <h3>Account</h3>
     <input id="user" placeholder="Username"><br><br>
     <input id="pass" type="password" placeholder="Password"><br><br>
-    <button class="btn" onclick="signup()">Sign Up</button>
-    <button class="btn" onclick="login()">Login</button>
+    <input id="pfp" placeholder="Profile picture URL (optional)"><br><br>
+    <button onclick="signup()">Sign Up</button>
+    <button onclick="login()">Login</button>
   </div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, getDocs, doc, getDoc, setDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {
+  getFirestore, collection, getDocs, doc, getDoc,
+  setDoc, updateDoc, increment
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const app = initializeApp({
-  apiKey:"AIzaSyD...",
+  apiKey:"AIzaSyD4An6C8ZEdiJsohwo76QuRxv1hhjNmRlI",
   authDomain:"mcspaceomega.firebaseapp.com",
   projectId:"mcspaceomega"
 });
-
-const db=getFirestore(app);
-
-const recommended=["M5R9X1NY"];
-const verified=["RedWorld"];
+const db = getFirestore(app);
 
 let allServers=[];
+let userLocal=localStorage.getItem("user");
+
+if(userLocal) authBtn.innerText=userLocal;
 
 /* AUTH */
-function setUser(u){
+window.signup=async()=>{
+  const u=user.value;
+  const p=pass.value;
+  const pic=pfp.value||"no";
+
+  const ref=doc(db,"users",u);
+  if((await getDoc(ref)).exists()) return alert("Taken");
+
+  await setDoc(ref,{password:p,pfp:pic,subs:0,desc:""});
   localStorage.setItem("user",u);
   authBtn.innerText=u;
-}
-
-window.signup=async()=>{
-  const ref=doc(db,"users",user.value);
-  if((await getDoc(ref)).exists()) return alert("Taken");
-  await setDoc(ref,{password:pass.value});
-  setUser(user.value);
   authModal.style.display="none";
 };
 
 window.login=async()=>{
   const snap=await getDoc(doc(db,"users",user.value));
   if(!snap.exists()) return alert("No user");
-  if(snap.data().password!==pass.value) return alert("Wrong pass");
-  setUser(user.value);
+  if(snap.data().password!==pass.value) return alert("Wrong");
+
+  localStorage.setItem("user",user.value);
+  authBtn.innerText=user.value;
   authModal.style.display="none";
 };
 
-window.openAuth=()=>authModal.style.display="flex";
+window.openAuth=()=>authModal.style.display="block";
 
-/* LOAD */
+/* LOAD SERVERS */
 async function load(){
   const snap=await getDocs(collection(db,"servers"));
   allServers=[];
@@ -274,58 +185,48 @@ async function load(){
 }
 
 /* RENDER */
-function render(list){
-  const grid=document.getElementById("grid");
+async function render(list){
   grid.innerHTML="";
-
   const maxGrowth=Math.max(...list.map(s=>s.growth||0),1);
 
-  list.sort((a,b)=>b.visits-a.visits);
+  for(const s of list){
+    const userSnap=await getDoc(doc(db,"users",s.author));
+    const pfp=userSnap.exists()&&userSnap.data().pfp!=="no"
+      ?userSnap.data().pfp:"assets/default.png";
 
-  list.forEach(s=>{
-    const trending=(s.growth||0)>maxGrowth*0.6;
-    const isRec=recommended.includes(s.code);
-
+    const trending=s.growth>maxGrowth*0.6;
     const favs=JSON.parse(localStorage.getItem("favs")||"[]");
 
     const card=document.createElement("div");
-    card.className="card"+(trending?" trending":"")+(isRec?" recommended":"");
+    card.className="card"+(trending?" trending":"");
 
     card.innerHTML=`
-      ${isRec?'<div class="badge recommended">★ RECOMMENDED</div>':''}
-      ${trending?'<div class="badge trending">🔥 TRENDING</div>':''}
-
-      <img class="bg" src="${s.bg||'bgs/bg1.png'}">
+      ${trending?'<div class="badge trending">TRENDING</div>':''}
+      <img class="bg" src="${s.bg}">
       <div class="content">
-        <div class="name">${s.name}</div>
-
-        <div class="author">
-          by ${s.author}
-          ${verified.includes(s.author)?'<img class="check" src="assets/check.png">':''}
-        </div>
-
-        <div class="desc">${s.desc}</div>
-
+        <b>${s.name}</b><br>
+        <small><img src="${pfp}" width="14"> ${s.author}</small>
+        <p>${s.desc}</p>
         <div class="actions">
-          <div class="visits">${s.visits||0} visits</div>
+          <span>${s.visits||0} visits</span>
           <div>
             <span class="fav" onclick="fav('${s.code}')">
               ${favs.includes(s.code)?"❤️":"🤍"}
             </span>
-            <button class="btn" onclick="play('${s.code}')">Play</button>
+            <button onclick="play('${s.code}')">Play</button>
           </div>
         </div>
       </div>
     `;
     grid.appendChild(card);
-  });
+  }
 }
 
 /* FAVORITES */
-window.fav=function(code){
-  let favs=JSON.parse(localStorage.getItem("favs")||"[]");
-  favs.includes(code)?favs=favs.filter(x=>x!==code):favs.push(code);
-  localStorage.setItem("favs",JSON.stringify(favs));
+window.fav=(c)=>{
+  let f=JSON.parse(localStorage.getItem("favs")||"[]");
+  f.includes(c)?f=f.filter(x=>x!==c):f.push(c);
+  localStorage.setItem("favs",JSON.stringify(f));
   render(allServers);
 };
 
@@ -336,35 +237,27 @@ search.oninput=()=>{
 };
 
 /* PLAY */
-const COOLDOWN=10*60*1000;
-
-window.play=async(code)=>{
-  const key="visit_"+code;
+const COOLDOWN=600000;
+window.play=async(c)=>{
+  const key="v_"+c;
   const now=Date.now();
 
   if(!localStorage.getItem(key)||now-localStorage.getItem(key)>COOLDOWN){
-    await updateDoc(doc(db,"servers",code),{visits:increment(1)});
+    await updateDoc(doc(db,"servers",c),{visits:increment(1)});
     localStorage.setItem(key,now);
   }
 
-  location.href="server.html?code="+code;
+  location.href="server.html?code="+c;
 };
 
-/* BUTTONS */
 window.openAdd=()=>{
-  if(!localStorage.getItem("user")){
-    openAuth();
-  }else{
-    location.href="mailto:add@mtcspace.com";
-  }
+  if(!localStorage.getItem("user")) return openAuth();
+  location.href="mailto:add@mtcspace.com";
 };
 
-window.contact=()=>{
-  location.href="mailto:contact@mtcspace.com";
-};
+window.contact=()=>location.href="mailto:contact@mtcspace.com";
 
 load();
 </script>
-
 </body>
 </html>
