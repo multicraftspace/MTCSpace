@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="refresh" content="0; url=https://mtcspace.com/m">
 <title>MTCSpace</title>
 
 <style>
@@ -33,18 +32,19 @@ body{
 
 .right{display:flex;gap:10px;align-items:center;}
 
-button{
-  font-family:'MultiCraft';
-  cursor:pointer;
-}
-
 /* BUTTON */
 .btn{
-  padding:10px 16px;
+  padding:10px 14px;
   border-radius:12px;
   border:2px solid #a855f7;
   background:linear-gradient(135deg,#a855f7,#7e22ce);
   color:white;
+  cursor:pointer;
+  font-family:'MultiCraft';
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  height:40px;
   transition:0.25s;
 }
 .btn:hover{
@@ -83,7 +83,6 @@ button{
   border:2px solid transparent;
 }
 
-/* BADGES */
 .card.recommended{border:2px solid cyan;}
 .card.trending{border:2px solid red;}
 
@@ -103,16 +102,41 @@ button{
 }
 .badge.trending{background:red;}
 
-/* CONTENT */
-.content{padding:12px;display:flex;flex-direction:column;flex:1;}
+.bg{
+  width:100%;
+  aspect-ratio:16/9;
+  object-fit:cover;
+}
 
-.title-row{display:flex;align-items:center;gap:6px;}
+/* CONTENT */
+.content{
+  padding:12px;
+  display:flex;
+  flex-direction:column;
+  flex:1;
+}
+
+.title-row{
+  display:flex;
+  gap:6px;
+  align-items:center;
+}
+
+.name{
+  font-weight:bold;
+  font-size:14px;
+}
 
 .author{
   font-size:12px;
   opacity:0.7;
   margin-top:4px;
+  display:flex;
+  align-items:center;
+  gap:5px;
 }
+
+.check{width:14px;}
 
 .desc{
   font-size:13px;
@@ -125,10 +149,11 @@ button{
   overflow:hidden;
 }
 
+/* ACTIONS FIXED */
 .actions{
   margin-top:auto;
   display:flex;
-  gap:6px;
+  gap:8px;
   align-items:center;
 }
 
@@ -139,15 +164,25 @@ button{
 .fav-btn{
   width:40px;
   height:40px;
-  border-radius:10px;
+  border-radius:12px;
   border:2px solid #a855f7;
   background:white;
   display:flex;
   align-items:center;
   justify-content:center;
+  cursor:pointer;
+}
+.fav-btn.active{
+  background:#ffd6ff;
 }
 
-.fav-btn.active{background:#ffd6ff;}
+/* VISITS */
+.visits{
+  font-size:12px;
+  opacity:0.7;
+  margin-top:4px;
+}
+
 </style>
 </head>
 
@@ -162,7 +197,7 @@ button{
   <div class="right">
     <button class="btn" onclick="addServer()">+ Add my server</button>
     <button class="btn" onclick="support()">📧</button>
-    <button class="btn" id="authBtn" onclick="authAction()">Sign Up</button>
+    <button class="btn" id="userBtn">Sign Up</button>
   </div>
 </div>
 
@@ -172,36 +207,42 @@ button{
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, doc, getDoc, updateDoc, increment, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {
+  getFirestore, doc, getDoc, updateDoc,
+  increment, setDoc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const app = initializeApp({
   apiKey:"AIzaSy...",
-  authDomain:"mcspaceomega.firebaseapp.com",
   projectId:"mcspaceomega"
 });
 const db=getFirestore(app);
 
-/* USERS */
-let user=localStorage.getItem("user");
-if(user){
-  document.getElementById("authBtn").innerText=user;
-}
+const verifiedUsers=["RedWorld"];
+const recommended=["M5R9X1NY"];
 
-/* SERVERS */
 let servers=[
-{id:1,name:"Erratic SMP",desc:"Good MultiCraft SMP with no areas, and more very cool features.",code:"M5R9X1NY",author:"RedWorld"},
-{id:2,name:"Ronaldo Vs Messi",desc:"BEST SERVER 👌, PARKOUR / PvP / MINI GAMES / BEDWARS / MANHUNT / TREASURE HUNT / BRIDGING / AXE PVP / AND MANY MORE .. ✨",code:"KAAYBNDP",author:"Elder"},
-{id:3,name:"FlatWorld",desc:"Creative Server",code:"MCSRVR03",author:"Unknown"},
-{id:4,name:"New Types PvP",desc:"Awesome PvP server, with a lot fun features and gamemodes.",code:"JLIVC3V9",author:"Unknown"},
-{id:5,name:"SMP12",desc:"In here, it's your job to have fun! The world open, PVP; it's a place where you can do anything!",code:"94D92LVD",author:"Jared12"},
-{id:6,name:"Stone Simulator",desc:"In here, we live underground! Also, we buy items from The Shop! With currencies such as Stone, Cobblestone, and more!",code:"XX9IXQ6H",author:"Jared12"},
-{id:7,name:"Parkour Cubicles",desc:"In here, YOU will try to beat the impossible 36 cubicles of the server to escape!",code:"QVZACNG5",author:"Jared12"}
+{id:1,name:"Erratic SMP",desc:"Good MultiCraft SMP with no areas, and more very cool features.",code:"M5R9X1NY",author:"RedWorld",bg:"bgs/bg1.png",heart:"hearts/hpvp.png"},
+{id:2,name:"Ronaldo Vs Messi",desc:"BEST SERVER 👌, PARKOUR / PvP / MINI GAMES / BEDWARS / MANHUNT / TREASURE HUNT / BRIDGING / AXE PVP / AND MANY MORE .. ✨",code:"KAAYBNDP",author:"Elder",bg:"bgs/bg2.png",heart:"hearts/hpvp.png"},
+{id:3,name:"FlatWorld",desc:"Creative Server",code:"MCSRVR03",author:"Unknown",bg:"bgs/bg3.png",heart:"hearts/hc.png"},
+{id:4,name:"New Types PvP",desc:"Awesome PvP server, with a lot fun features and gamemodes.",code:"JLIVC3V9",author:"Unknown",bg:"bgs/bg4.png",heart:"hearts/hpvp.png"},
+{id:5,name:"SMP12",desc:"In here, it's your job to have fun! The world open, PVP; it's a place where you can do anything!",code:"94D92LVD",author:"Jared12",bg:"bgs/bg5.png",heart:"hearts/hpvp.png"},
+{id:6,name:"Stone Simulator",desc:"In here, we live underground! Also, we buy items from The Shop! With currencies such as Stone, Cobblestone, and more!",code:"XX9IXQ6H",author:"Jared12",bg:"bgs/bg6.png",heart:"hearts/hpvp.png"},
+{id:7,name:"Parkour Cubicles",desc:"In here, YOU will try to beat the impossible 36 cubicles of the server to escape!",code:"QVZACNG5",author:"Jared12",bg:"bgs/bg7.png",heart:"hearts/hpvp.png"}
 ];
 
 async function load(){
   await Promise.all(servers.map(async s=>{
     const snap=await getDoc(doc(db,"servers",s.code));
-    s.visits=snap.exists()?snap.data().visits||0:0;
+    if(snap.exists()){
+      const d=snap.data();
+      s.visits=d.visits||0;
+      s.lastVisits=d.lastVisits||0;
+    } else {
+      s.visits=0;
+      s.lastVisits=0;
+    }
+    s.growth=s.visits-s.lastVisits;
   }));
 
   render("");
@@ -211,29 +252,40 @@ function render(search){
   const grid=document.getElementById("grid");
   grid.innerHTML="";
 
-  let filtered=servers.filter(s=>s.name.toLowerCase().includes(search.toLowerCase()));
+  let list=servers.filter(s=>s.name.toLowerCase().includes(search.toLowerCase()));
 
-  const max=Math.max(...filtered.map(s=>s.visits));
-  filtered.forEach(s=>{
-    s.trending=s.visits>max*0.6;
-  });
+  const maxGrowth=Math.max(...list.map(s=>s.growth||0));
 
-  filtered.sort((a,b)=>b.visits-a.visits);
+  list.forEach(s=>{
+    const trending = !recommended.includes(s.code) && s.growth >= maxGrowth*0.6;
 
-  filtered.forEach(s=>{
     const favs=JSON.parse(localStorage.getItem("favs")||"[]");
+    const verified=verifiedUsers.includes(s.author);
 
     const card=document.createElement("div");
-    card.className="card "+(s.trending?"trending":"");
+    card.className="card"+
+      (trending?" trending":"")+
+      (recommended.includes(s.code)?" recommended":"");
 
     card.innerHTML=`
-      ${s.trending?'<div class="badge trending">🔥 TRENDING</div>':''}
+      ${recommended.includes(s.code)?'<div class="badge recommended">★</div>':''}
+      ${trending?'<div class="badge trending">🔥</div>':''}
+
+      <img class="bg" src="${s.bg}">
+
       <div class="content">
         <div class="title-row">
-          <div>${s.name}</div>
+          <img src="${s.heart}" width="18">
+          <div class="name">${s.name}</div>
         </div>
-        <div class="author">by ${s.author}</div>
+
+        <div class="author">
+          by ${s.author}
+          ${verified?'<img class="check" src="assets/check.png">':''}
+        </div>
+
         <div class="desc">${s.desc}</div>
+        <div class="visits">${s.visits} visits</div>
 
         <div class="actions">
           <button class="btn play-btn" onclick="join('${s.code}')">Play</button>
@@ -241,6 +293,7 @@ function render(search){
         </div>
       </div>
     `;
+
     grid.appendChild(card);
   });
 }
@@ -255,34 +308,32 @@ window.fav=function(code,el){
     el.classList.add("active");
   }
   localStorage.setItem("favs",JSON.stringify(favs));
-}
+};
+
+const COOLDOWN=10*60*1000;
 
 window.join=async function(code){
-  const ref=doc(db,"servers",code);
-  try{await updateDoc(ref,{visits:increment(1)});}
-  catch{await setDoc(ref,{visits:1});}
+  const key="visit_"+code;
+  const now=Date.now();
+  const last=localStorage.getItem(key);
+
+  if(!last || now-last>COOLDOWN){
+    const ref=doc(db,"servers",code);
+    try{await updateDoc(ref,{visits:increment(1)});}
+    catch{await setDoc(ref,{visits:1});}
+    localStorage.setItem(key,now);
+  }
+
   location.href="server.html?code="+code;
-}
+};
 
 window.addServer=function(){
-  if(!user){
-    alert("Sign up first");
-    return;
-  }
-  location.href="mailto:add@mtcspace.com";
-}
+  location.href="mailto:add@mtcspace.com?subject=Add My Server&body=Server invite code:%0ADescription:%0AAuthor:";
+};
 
 window.support=function(){
-  location.href="mailto:contact@mtcspace.com";
-}
-
-window.authAction=function(){
-  const u=prompt("Username?");
-  if(u){
-    localStorage.setItem("user",u);
-    location.reload();
-  }
-}
+  location.href="mailto:contact@mtcspace.com?subject=I need help";
+};
 
 load();
 </script>
