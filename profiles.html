@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profile • MTCSpace</title>
+
+<style>
+@font-face{
+  font-family:'MultiCraft';
+  src:url('assets/MultiCraft.ttf');
+}
+
+body{
+  margin:0;
+  font-family:'MultiCraft';
+  background: radial-gradient(circle at top,#ffffff,#f3e8ff);
+  color:#2d0b4e;
+}
+
+/* HEADER */
+.header{
+  padding:20px;
+  border-bottom:2px solid #a855f7;
+  display:flex;
+  align-items:center;
+  gap:15px;
+}
+
+/* PROFILE CARD */
+.profile{
+  max-width:900px;
+  margin:30px auto;
+  background:white;
+  border-radius:20px;
+  padding:25px;
+  box-shadow:0 15px 35px rgba(168,85,247,0.2);
+}
+
+/* PFP */
+.pfp{
+  width:90px;
+  height:90px;
+  border-radius:50%;
+  object-fit:cover;
+  border:3px solid #a855f7;
+}
+
+/* USER INFO */
+.row{
+  display:flex;
+  gap:20px;
+  align-items:center;
+}
+
+.name{
+  font-size:22px;
+  font-weight:bold;
+}
+
+.check{
+  width:18px;
+  margin-left:5px;
+}
+
+/* DESC */
+.desc{
+  margin-top:10px;
+  opacity:0.8;
+}
+
+/* BUTTON */
+.btn{
+  padding:10px 16px;
+  border-radius:12px;
+  border:2px solid #a855f7;
+  background:linear-gradient(135deg,#a855f7,#7e22ce);
+  color:white;
+  cursor:pointer;
+  margin-top:10px;
+}
+
+/* SERVERS GRID */
+.grid{
+  max-width:900px;
+  margin:20px auto;
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:20px;
+}
+
+/* CARD */
+.card{
+  background:white;
+  border-radius:15px;
+  overflow:hidden;
+  box-shadow:0 10px 25px rgba(0,0,0,0.1);
+  cursor:pointer;
+  transition:0.2s;
+}
+.card:hover{
+  transform:translateY(-5px);
+}
+
+.bg{
+  width:100%;
+  aspect-ratio:16/9;
+  object-fit:cover;
+}
+
+.content{
+  padding:10px;
+}
+
+.title{
+  font-weight:bold;
+}
+
+.small{
+  font-size:12px;
+  opacity:0.7;
+}
+
+/* EDIT BOX */
+textarea{
+  width:100%;
+  padding:10px;
+  border-radius:10px;
+  border:2px solid #a855f7;
+  margin-top:10px;
+  font-family:'MultiCraft';
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <div onclick="location.href='index.html'" style="cursor:pointer;">← Back</div>
+</div>
+
+<div class="profile">
+  <div class="row">
+    <img id="pfp" class="pfp">
+
+    <div>
+      <div class="name">
+        @<span id="username"></span>
+        <img id="check" class="check" style="display:none;" src="assets/check.png">
+      </div>
+
+      <div id="subsText" class="small"></div>
+
+      <button id="subBtn" class="btn" onclick="subscribe()">Subscribe</button>
+    </div>
+  </div>
+
+  <div id="desc" class="desc"></div>
+
+  <!-- EDIT -->
+  <div id="editBox" style="display:none;">
+    <textarea id="descInput" placeholder="Write your description..."></textarea>
+    <button class="btn" onclick="saveDesc()">Save</button>
+  </div>
+</div>
+
+<h3 style="max-width:900px;margin:auto;">Servers</h3>
+<div id="servers" class="grid"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+getFirestore, doc, getDoc, updateDoc, increment,
+collection, getDocs
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+/* FIREBASE */
+const app = initializeApp({
+  apiKey: "AIzaSyD4An6C8ZEdiJsohwo76QuRxv1hhjNmRlI",
+  authDomain: "mcspaceomega.firebaseapp.com",
+  projectId: "mcspaceomega",
+  storageBucket: "mcspaceomega.firebasestorage.app",
+  messagingSenderId: "984192110931",
+  appId: "1:984192110931:web:d7392a9815ab248c6391a6"
+});
+
+const db = getFirestore(app);
+
+/* GET USER */
+const username = new URLSearchParams(location.search).get("u")?.replace("@","");
+const currentUser = localStorage.getItem("user");
+
+/* LOAD PROFILE */
+async function load(){
+  const snap = await getDoc(doc(db,"users",username));
+  if(!snap.exists()) return;
+
+  const u = snap.data();
+
+  usernameEl.innerText = username;
+  subsText.innerText = (u.subs||0) + " subscribers";
+
+  desc.innerText = u.desc || "No description yet.";
+
+  pfp.src = (u.pfp && u.pfp !== "no")
+    ? u.pfp
+    : "assets/default.png";
+
+  /* VERIFIED */
+  if(u.verifiedUser){
+    check.style.display="inline";
+  }
+
+  /* EDIT */
+  if(currentUser === username){
+    editBox.style.display="block";
+    subBtn.style.display="none";
+  }
+
+  loadServers();
+}
+
+/* LOAD USER SERVERS */
+async function loadServers(){
+  const snap = await getDocs(collection(db,"servers"));
+  servers.innerHTML="";
+
+  snap.forEach(d=>{
+    const s = d.data();
+    if(s.author !== username) return;
+
+    const card = document.createElement("div");
+    card.className="card";
+
+    card.innerHTML=`
+      <img class="bg" src="${s.bg}">
+      <div class="content">
+        <div class="title">${s.name}</div>
+        <div class="small">${s.visits||0} visits</div>
+      </div>
+    `;
+
+    card.onclick=()=>{
+      location.href="server.html?code="+d.id;
+    };
+
+    servers.appendChild(card);
+  });
+}
+
+/* SUBSCRIBE */
+window.subscribe = async ()=>{
+  const key = "sub_"+username;
+  if(localStorage.getItem(key)) return alert("Already subscribed");
+
+  await updateDoc(doc(db,"users",username),{
+    subs: increment(1)
+  });
+
+  localStorage.setItem(key,"1");
+  load();
+};
+
+/* SAVE DESC */
+window.saveDesc = async ()=>{
+  await updateDoc(doc(db,"users",username),{
+    desc: descInput.value
+  });
+  load();
+};
+
+load();
+</script>
+
+</body>
+</html>
