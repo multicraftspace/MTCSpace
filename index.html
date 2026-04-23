@@ -219,11 +219,19 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 /* FIREBASE */
-const app = initializeApp({
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
   apiKey: "AIzaSyD4An6C8ZEdiJsohwo76QuRxv1hhjNmRlI",
   authDomain: "mcspaceomega.firebaseapp.com",
-  projectId: "mcspaceomega"
-});
+  projectId: "mcspaceomega",
+  storageBucket: "mcspaceomega.appspot.com", // ⚠️ IMPORTANT FIX
+  messagingSenderId: "984192110931",
+  appId: "1:984192110931:web:d7392a9815ab248c6391a6"
+};
+
+const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 const recommended=["M5R9X1NY"];
