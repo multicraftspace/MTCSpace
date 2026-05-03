@@ -1,394 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="refresh" content="0; url=https://mtcspace.com/m">
-<title>MTCSpace</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MTCSpace - Maintenance</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+    }
 
-<style>
-@font-face{
-  font-family:'MultiCraft';
-  src:url('assets/MultiCraft.ttf');
-}
+    .box {
+      max-width: 600px;
+      padding: 40px;
+    }
 
-body{
-  margin:0;
-  font-family:'MultiCraft';
-  background: radial-gradient(circle at top,#ffffff,#f3e8ff);
-  color:#2d0b4e;
-}
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+    }
 
-/* HEADER */
-.header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:15px 25px;
-  border-bottom:2px solid #a855f7;
-}
+    p {
+      font-size: 1.1rem;
+      opacity: 0.8;
+    }
 
-.logo{
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-.logo img{height:40px;}
-
-.search{
-  padding:10px 14px;
-  border-radius:12px;
-  border:2px solid #a855f7;
-  outline:none;
-  font-family:'MultiCraft';
-  width:260px;
-}
-
-/* BUTTON */
-.btn{
-  font-family:'MultiCraft';
-  padding:10px 16px;
-  border-radius:12px;
-  border:2px solid #a855f7;
-  background:linear-gradient(135deg,#a855f7,#7e22ce);
-  color:white;
-  cursor:pointer;
-  transition:0.25s;
-}
-.btn:hover{
-  transform:translateY(-2px) scale(1.05);
-  box-shadow:0 8px 20px rgba(168,85,247,0.4);
-}
-
-/* GRID */
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
-  gap:25px;
-  padding:30px;
-}
-
-/* CARD */
-.card{
-  position:relative;
-  border-radius:20px;
-  overflow:hidden;
-  background:white;
-  box-shadow:0 15px 35px rgba(168,85,247,0.25);
-  display:flex;
-  flex-direction:column;
-  border:2px solid transparent;
-  transition:0.25s;
-}
-.card:hover{
-  transform:translateY(-6px);
-}
-
-/* BADGES */
-.card.trending{border:2px solid red;}
-.card.recommended{border:2px solid cyan;}
-
-.badge{
-  position:absolute;
-  top:10px;
-  left:10px;
-  padding:5px 10px;
-  border-radius:10px;
-  font-size:11px;
-  z-index:5;
-}
-
-.badge.trending{background:red;color:white;}
-.badge.recommended{
-  background:linear-gradient(90deg,#00e5ff,#00ffa6);
-  color:black;
-}
-
-/* IMAGE */
-.bg{
-  width:100%;
-  aspect-ratio:16/9;
-  object-fit:cover;
-}
-
-/* CONTENT */
-.content{
-  padding:12px;
-  display:flex;
-  flex-direction:column;
-  flex:1;
-}
-
-.name{
-  font-weight:bold;
-  font-size:15px;
-}
-
-/* AUTHOR */
-.author{
-  display:flex;
-  align-items:center;
-  gap:6px;
-  font-size:12px;
-  opacity:0.7;
-  margin-top:3px;
-}
-
-.pfp{
-  width:18px;
-  height:18px;
-  border-radius:50%;
-  object-fit:cover;
-}
-
-.check{
-  width:14px;
-}
-
-/* DESC */
-.desc{
-  font-size:13px;
-  opacity:0.7;
-  margin-top:6px;
-
-  display:-webkit-box;
-  -webkit-line-clamp:3;
-  -webkit-box-orient:vertical;
-  overflow:hidden;
-}
-
-/* ACTIONS */
-.actions{
-  margin-top:auto;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-.visits{
-  font-size:12px;
-  opacity:0.7;
-}
-
-/* RIGHT SIDE BUTTONS */
-.right{
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-
-/* FAVORITE */
-.fav{
-  cursor:pointer;
-  font-size:16px;
-  margin-right:8px;
-}
-
-/* AUTH BUTTON */
-.user-btn{
-  display:flex;
-  align-items:center;
-  gap:6px;
-}
-</style>
+    a {
+      color: #a855f7;
+      text-decoration: none;
+      font-weight: bold;
+    }
+  </style>
 </head>
-
 <body>
-
-<div class="header">
-  <div class="logo">
-    <img src="assets/logo.png">
-    <div>MTCSpace</div>
+  <div class="box">
+    <h1>MTCSpace is Under Maintenance</h1>
+    <p>We're currently making improvements and will be back soon.</p>
+    <p>For questions, contact us at:</p>
+    <p><a href="mailto:contact@mtcspace.com">contact@mtcspace.com</a></p>
   </div>
-
-  <input id="search" class="search" placeholder="Search servers...">
-
-  <div class="right">
-    <button class="btn" onclick="openAdd()">+ Add my server</button>
-    <button class="btn" onclick="contact()">📩</button>
-    <button id="authBtn" class="btn" onclick="openAuth()">Sign Up</button>
-  </div>
-</div>
-
-<div id="grid" class="grid"></div>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {
-  getFirestore, collection, getDocs,
-  doc, getDoc, updateDoc, increment
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-/* FIREBASE */
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyD4An6C8ZEdiJsohwo76QuRxv1hhjNmRlI",
-  authDomain: "mcspaceomega.firebaseapp.com",
-  projectId: "mcspaceomega",
-  storageBucket: "mcspaceomega.appspot.com", // ⚠️ IMPORTANT FIX
-  messagingSenderId: "984192110931",
-  appId: "1:984192110931:web:d7392a9815ab248c6391a6"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-const recommended=["M5R9X1NY"];
-
-let allServers=[];
-
-/* AUTH DISPLAY */
-async function loadUser(){
-  const u = localStorage.getItem("user");
-  if(!u) return;
-
-  const snap = await getDoc(doc(db,"users",u));
-  if(!snap.exists()) return;
-
-  const d = snap.data();
-
-  authBtn.innerHTML = `
-    <div class="user-btn">
-      <img class="pfp" src="${d.pfpURL && d.pfpURL!=="no"?d.pfpURL:"assets/default.png"}">
-      ${u}
-    </div>
-  `;
-}
-
-/* LOAD SERVERS */
-async function load(){
-  try{
-    const snap = await getDocs(collection(db,"servers"));
-
-    allServers = [];
-
-    snap.forEach(d=>{
-      const s = d.data();
-      s.code = d.id;
-      s.growth = (s.visits||0) - (s.lastVisits||0);
-      allServers.push(s);
-    });
-
-    render(allServers);
-
-  }catch(e){
-    console.error("LOAD ERROR:", e);
-    document.body.innerHTML = "<h2 style='text-align:center'>Error loading servers</h2>";
-  }
-}
-
-  render(allServers);
-}
-
-/* RENDER */
-async function render(list){
-  const grid=document.getElementById("grid");
-  grid.innerHTML="";
-
-  const maxGrowth=Math.max(...list.map(s=>s.growth||0),1);
-
-  list.sort((a,b)=>b.visits-a.visits);
-
-  for(const s of list){
-
-    const userSnap = await getDoc(doc(db,"users",s.author));
-    const user = userSnap.exists()?userSnap.data():{};
-
-    const trending=(s.growth||0)>maxGrowth*0.6;
-    const isRec=recommended.includes(s.code);
-
-    const favs=JSON.parse(localStorage.getItem("favs")||"[]");
-
-    const card=document.createElement("div");
-    card.className="card"+(trending?" trending":"")+(isRec?" recommended":"");
-
-    card.innerHTML=`
-      ${isRec?'<div class="badge recommended">★ RECOMMENDED</div>':''}
-      ${trending?'<div class="badge trending">🔥 TRENDING</div>':''}
-
-      <img class="bg" src="${s.bg || 'bgs/bg1.png'}">
-
-      <div class="content">
-        <div class="name">${s.name}</div>
-
-        <div class="author">
-          <img class="pfp" src="${user.pfpURL && user.pfpURL!=="no"?user.pfpURL:"assets/default.png"}">
-          ${s.author}
-          ${user.verified?'<img class="check" src="assets/check.png">':''}
-        </div>
-
-        <div class="desc">${s.desc}</div>
-
-        <div class="actions">
-          <div class="visits">${s.visits||0} visits</div>
-
-          <div>
-            <span class="fav" onclick="fav('${s.code}')">
-              ${favs.includes(s.code)?"❤️":"🤍"}
-            </span>
-            <button class="btn" onclick="play('${s.code}')">Play</button>
-          </div>
-        </div>
-      </div>
-    `;
-
-    grid.appendChild(card);
-  }
-}
-
-/* FAVORITES */
-window.fav=(code)=>{
-  let favs=JSON.parse(localStorage.getItem("favs")||"[]");
-  favs.includes(code)?favs=favs.filter(x=>x!==code):favs.push(code);
-  localStorage.setItem("favs",JSON.stringify(favs));
-  render(allServers);
-};
-
-/* SEARCH */
-search.oninput=()=>{
-  const q=search.value.toLowerCase();
-  render(allServers.filter(s=>s.name.toLowerCase().includes(q)));
-};
-
-/* PLAY */
-const COOLDOWN=10*60*1000;
-
-window.play=async(code)=>{
-  const key="visit_"+code;
-  const now=Date.now();
-
-  if(!localStorage.getItem(key)||now-localStorage.getItem(key)>COOLDOWN){
-    await updateDoc(doc(db,"servers",code),{
-      visits:increment(1)
-    });
-    localStorage.setItem(key,now);
-  }
-
-  location.href="server.html?code="+code;
-};
-
-/* BUTTONS */
-window.openAdd=()=>{
-  if(!localStorage.getItem("user")){
-    alert("Sign up first!");
-  }else{
-    location.href="mailto:add@mtcspace.com";
-  }
-};
-
-window.contact=()=>{
-  location.href="mailto:contact@mtcspace.com";
-};
-
-window.openAuth = () => {
-  document.getElementById("authModal").style.display = "flex";
-};
-
-load();
-loadUser();
-</script>
-
 </body>
 </html>
